@@ -176,6 +176,21 @@ Item {
                 }
 
                 QGCToolBarButton {
+                                id:                shaferButton
+                                Layout.fillHeight: true
+                                icon.source: "/qmlimages/Armed.svg"
+                                visible: true
+                                onClicked: {
+                                    if (mainWindow.preventViewSwitch()) {
+                                        return
+                                    }
+                                    buttonRow.clearAllChecks()
+                                    checked = true
+                                    mainWindow.showSetupView2()
+                                }
+                            }
+
+                QGCToolBarButton {
                     id:                 analyzeButton
                     Layout.fillHeight:  true
                     icon.source:        "/qmlimages/Analyze.svg"
@@ -189,18 +204,6 @@ Item {
                         mainWindow.showAnalyzeView()
                     }
                 }
-
-                QGCToolBarButton {
-                                id:                shaferButton
-                                anchors.top: parent.top
-                                anchors.bottom: parent.bottom
-                                icon.source: "/qmlimages/Armed.svg"
-                                visible: QGroundControl.corePlugin.showAdvancedUI
-                                onClicked: {
-                                    checked = true
-                                    mainWindow.showSetupView2()
-                                }
-                            }
 
                 Item {
                     Layout.fillHeight:  true
