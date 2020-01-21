@@ -24,6 +24,7 @@ include(QGCCommon.pri)
 TARGET   = QGroundControl
 TEMPLATE = app
 QGCROOT  = $$PWD
+QT += network
 
 DebugBuild {
     DESTDIR  = $${OUT_PWD}/debug
@@ -456,6 +457,7 @@ contains (DEFINES, QGC_ENABLE_PAIRING) {
 }
 
 SOURCES += \
+    src/TestFTP.cc \
     src/api/QGCCorePlugin.cc \
     src/api/QGCOptions.cc \
     src/api/QGCSettings.cc \
@@ -702,6 +704,8 @@ HEADERS += \
     src/AnalyzeView/GeoTagController.h \
     src/AnalyzeView/ExifParser.h \
     src/uas/FileManager.h \
+    src/qftp.h \
+    src/qurlinfo.h \
 
 contains (DEFINES, QGC_ENABLE_PAIRING) {
     HEADERS += \
@@ -937,6 +941,8 @@ SOURCES += \
     src/AnalyzeView/GeoTagController.cc \
     src/AnalyzeView/ExifParser.cc \
     src/uas/FileManager.cc \
+    src/qftp.cc \
+    src/qurlinfo.cc \
 
 contains (DEFINES, QGC_ENABLE_PAIRING) {
     SOURCES += \

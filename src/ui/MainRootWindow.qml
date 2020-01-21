@@ -38,9 +38,6 @@ ApplicationWindow {
         }
     }
 
-    property var                _rgPreventViewSwitch:       [ false ]
-
-
     readonly property real      _topBottomMargins:          ScreenTools.defaultFontPixelHeight * 0.5
     readonly property string    _mainToolbar:               QGroundControl.corePlugin.options.mainToolbarUrl
     readonly property string    _planToolbar:               QGroundControl.corePlugin.options.planToolbarUrl
@@ -75,28 +72,10 @@ ApplicationWindow {
     //-------------------------------------------------------------------------
     //-- Global Scope Functions
 
-    /// Prevent view switching
-    function pushPreventViewSwitch() {
-        _rgPreventViewSwitch.push(true)
-    }
-
-    /// Allow view switching
-    function popPreventViewSwitch() {
-        if (_rgPreventViewSwitch.length == 1) {
-            console.warn("mainWindow.popPreventViewSwitch called when nothing pushed")
-            return
-        }
-        _rgPreventViewSwitch.pop()
-    }
-
-    /// @return true: View switches are not currently allowed
-    function preventViewSwitch() {
-        return _rgPreventViewSwitch[_rgPreventViewSwitch.length - 1]
-    }
-
     function viewSwitch(isPlanView) {
         settingsWindow.visible  = false
         setupWindow.visible     = false
+        setupWindow2.visible    = false
         analyzeWindow.visible   = false
         flightView.visible      = false
         planViewLoader.visible  = false
@@ -127,6 +106,11 @@ ApplicationWindow {
         setupWindow.visible = true
     }
 
+    function showSetupView2() {
+        viewSwitch(false)
+        setupWindow2.visible = true
+    }
+
     function showSettingsView() {
         viewSwitch(false)
         settingsWindow.visible = true
@@ -142,10 +126,6 @@ ApplicationWindow {
         simpleMessageDialog.title = title
         simpleMessageDialog.text  = text
         simpleMessageDialog.open()
-    }
-
-    MainWindowSavedState {
-        window: mainWindow
     }
 
     MessageDialog {
@@ -173,12 +153,8 @@ ApplicationWindow {
         mainWindowDialog.dialogComponent = component
         mainWindowDialog.dialogTitle = title
         mainWindowDialog.dialogButtons = buttons
-        mainWindow.pushPreventViewSwitch()
         mainWindowDialog.open()
-        if (buttons & StandardButton.Cancel || buttons & StandardButton.Close || buttons & StandardButton.Discard || buttons & StandardButton.Abort || buttons & StandardButton.Ignore) {
-            mainWindowDialog.closePolicy = Popup.NoAutoClose;
-            mainWindowDialog.interactive = false;
-        } else {
+        if(buttons & StandardButton.Cancel || buttons & StandardButton.Close || buttons & StandardButton.Discard || buttons & StandardButton.Abort || buttons & StandardButton.Ignore) {
             mainWindowDialog.closePolicy = Popup.CloseOnEscape | Popup.CloseOnPressOutside;
             mainWindowDialog.interactive = true;
         }
@@ -207,8 +183,6 @@ ApplicationWindow {
             dlgLoader.source = "QGCViewDialogContainer.qml"
         }
         onClosed: {
-            console.log("View switch ok")
-            mainWindow.popPreventViewSwitch()
             dlgLoader.source = ""
         }
     }
@@ -217,56 +191,8 @@ ApplicationWindow {
 
     function finishCloseProcess() {
         QGroundControl.linkManager.shutdown()
-        QGroundControl.videoManager.stopVideo();
         _forceClose = true
         mainWindow.close()
-    }
-
-    // On attempting an application close we check for:
-    //  Unsaved missions - then
-    //  Pending parameter writes - then
-    //  Active connections
-    onClosing: {
-        if (!_forceClose) {
-            unsavedMissionCloseDialog.check()
-            close.accepted = false
-        }
-    }
-
-    MessageDialog {
-        id:                 unsavedMissionCloseDialog
-        title:              qsTr("%1 close").arg(QGroundControl.appName)
-        text:               qsTr("You have a mission edit in progress which has not been saved/sent. If you close you will lose changes. Are you sure you want to close?")
-        standardButtons:    StandardButton.Yes | StandardButton.No
-        modality:           Qt.ApplicationModal
-        visible:            false
-        onYes:              pendingParameterWritesCloseDialog.check()
-        function check() {
-            if (planMasterControllerPlan && planMasterControllerPlan.dirty) {
-                unsavedMissionCloseDialog.open()
-            } else {
-                pendingParameterWritesCloseDialog.check()
-            }
-        }
-    }
-
-    MessageDialog {
-        id:                 pendingParameterWritesCloseDialog
-        title:              qsTr("%1 close").arg(QGroundControl.appName)
-        text:               qsTr("You have pending parameter updates to a vehicle. If you close you will lose changes. Are you sure you want to close?")
-        standardButtons:    StandardButton.Yes | StandardButton.No
-        modality:           Qt.ApplicationModal
-        visible:            false
-        onYes:              activeConnectionsCloseDialog.check()
-        function check() {
-            for (var index=0; index<QGroundControl.multiVehicleManager.vehicles.count; index++) {
-                if (QGroundControl.multiVehicleManager.vehicles.get(index).parameterManager.pendingWrites) {
-                    pendingParameterWritesCloseDialog.open()
-                    return
-                }
-            }
-            activeConnectionsCloseDialog.check()
-        }
     }
 
     MessageDialog {
@@ -282,6 +208,34 @@ ApplicationWindow {
                 activeConnectionsCloseDialog.open()
             } else {
                 finishCloseProcess()
+            }
+        }
+    }
+
+    //-------------------------------------------------------------------------
+    //-- Check for unsaved missions
+
+    onClosing: {
+        // Check first for unsaved missions and active connections
+        if (!_forceClose) {
+            unsavedMissionCloseDialog.check()
+            close.accepted = false
+        }
+    }
+
+    MessageDialog {
+        id:                 unsavedMissionCloseDialog
+        title:              qsTr("%1 close").arg(QGroundControl.appName)
+        text:               qsTr("You have a mission edit in progress which has not been saved/sent. If you close you will lose changes. Are you sure you want to close?")
+        standardButtons:    StandardButton.Yes | StandardButton.No
+        modality:           Qt.ApplicationModal
+        visible:            false
+        onYes:              activeConnectionsCloseDialog.check()
+        function check() {
+            if (planMasterControllerPlan && planMasterControllerPlan.dirty) {
+                unsavedMissionCloseDialog.open()
+            } else {
+                activeConnectionsCloseDialog.check()
             }
         }
     }
@@ -366,6 +320,15 @@ ApplicationWindow {
     }
 
     //-------------------------------------------------------------------------
+    //-- Setup UPDATE
+    Loader {
+        id:             setupWindow2
+        anchors.fill:   parent
+        visible:        false
+        source:         "test.qml"
+    }
+
+    //-------------------------------------------------------------------------
     //-- Analyze
     Loader {
         id:             analyzeWindow
@@ -382,6 +345,7 @@ ApplicationWindow {
         id: rootLoader
         anchors.centerIn: parent
     }
+
 
     //-------------------------------------------------------------------------
     //-- Vehicle Messages
@@ -627,12 +591,6 @@ ApplicationWindow {
         indicatorDropdown.currentIndicator = dropItem
         indicatorDropdown.currentItem = item
         indicatorDropdown.open()
-    }
-
-    function hidePopUp() {
-        indicatorDropdown.close()
-        indicatorDropdown.currentItem = null
-        indicatorDropdown.currentIndicator = null
     }
 
     Popup {
