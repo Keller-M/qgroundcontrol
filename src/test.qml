@@ -5,6 +5,8 @@ import QtQuick.Controls.Styles 1.4
 import QGroundControl.FactControls 1.0
 import QGroundControl.Palette 1.0
 
+import com.myself 1.0
+
 //import qgroundcontrol.Sources.src.myconfig_manager 1.0
 
 Rectangle {
@@ -152,11 +154,18 @@ Rectangle {
         font.pixelSize: 20
     }
 
+    FtpDialog{
+        id: myobject
+    }
+
     Button {
         id: connectFTPButton
         x: 352
         y: 49
         text: qsTr("Connect")
+        onClicked: {
+            myobject.connectClicked()
+        }
 
     }
 
@@ -172,6 +181,9 @@ Rectangle {
         x: 352
         y: 77
         text: qsTr("Disconnect")
+        onClicked:{
+            myobject.closeFTP()
+        }
     }
 
     Text {
@@ -194,6 +206,8 @@ Rectangle {
         x: 352
         y: 106
         text: qsTr("Start Radio")
+        onClicked:
+            myobject.downloadContent()
     }
 
     Button {

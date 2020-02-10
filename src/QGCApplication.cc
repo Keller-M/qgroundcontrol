@@ -27,6 +27,7 @@
 #include <QRegularExpression>
 #include <QFontDatabase>
 #include <QQuickWindow>
+#include "FtpDialog.h"
 
 #ifdef QGC_ENABLE_BLUETOOTH
 #include <QBluetoothLocalDevice>
@@ -493,6 +494,10 @@ void QGCApplication::_initCommon()
 
     qmlRegisterType<QGCPalette>     ("QGroundControl.Palette", 1, 0, "QGCPalette");
     qmlRegisterType<QGCMapPalette>  ("QGroundControl.Palette", 1, 0, "QGCMapPalette");
+
+    //QScopedPointer<QApplication> app(createApplication)
+
+    qmlRegisterType<FtpDialog>("com.myself", 1, 0, "FtpDialog");
 
     qmlRegisterUncreatableType<Vehicle>                 (kQGCVehicle,                       1, 0, "Vehicle",                    kRefOnly);
     qmlRegisterUncreatableType<MissionManager>          (kQGCVehicle,                       1, 0, "MissionManager",             kRefOnly);
