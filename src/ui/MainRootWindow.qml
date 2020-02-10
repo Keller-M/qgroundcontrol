@@ -39,6 +39,9 @@ ApplicationWindow {
         }
     }
 
+    property var                _rgPreventViewSwitch:       [ false ]
+
+
     readonly property real      _topBottomMargins:          ScreenTools.defaultFontPixelHeight * 0.5
     readonly property string    _mainToolbar:               QGroundControl.corePlugin.options.mainToolbarUrl
     readonly property string    _planToolbar:               QGroundControl.corePlugin.options.planToolbarUrl
@@ -76,6 +79,25 @@ ApplicationWindow {
 
     //-------------------------------------------------------------------------
     //-- Global Scope Functions
+
+    /// Prevent view switching
+        function pushPreventViewSwitch() {
+            _rgPreventViewSwitch.push(true)
+        }
+
+        /// Allow view switching
+        function popPreventViewSwitch() {
+            if (_rgPreventViewSwitch.length == 1) {
+                console.warning("mainWindow.popPreventViewSwitch called when nothing pushed")
+                return
+            }
+            _rgPreventViewSwitch.pop()
+        }
+
+        /// @return true: View switches are not currently allowed
+        function preventViewSwitch() {
+            return _rgPreventViewSwitch[_rgPreventViewSwitch.length - 1]
+        }
 
     function viewSwitch(isPlanView) {
         settingsWindow.visible  = false
@@ -163,6 +185,7 @@ ApplicationWindow {
         mainWindowDialog.dialogComponent = component
         mainWindowDialog.dialogTitle = title
         mainWindowDialog.dialogButtons = buttons
+        mainWindow.pushPreventViewSwitch()
         mainWindowDialog.open()
         if(buttons & StandardButton.Cancel || buttons & StandardButton.Close || buttons & StandardButton.Discard || buttons & StandardButton.Abort || buttons & StandardButton.Ignore) {
             mainWindowDialog.closePolicy = Popup.CloseOnEscape | Popup.CloseOnPressOutside;
