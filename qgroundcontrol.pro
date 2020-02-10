@@ -589,7 +589,6 @@ HEADERS += \
     src/JsonHelper.h \
     src/KMLFileHelper.h \
     src/LogCompressor.h \
-    src/MG.h \
     src/MissionManager/CameraCalc.h \
     src/MissionManager/CameraSection.h \
     src/MissionManager/CameraSpec.h \
@@ -693,7 +692,6 @@ HEADERS += \
     src/comm/LinkManager.h \
     src/comm/LogReplayLink.h \
     src/comm/MAVLinkProtocol.h \
-    src/comm/ProtocolInterface.h \
     src/comm/QGCMAVLink.h \
     src/comm/TCPLink.h \
     src/comm/UDPLink.h \
@@ -1382,18 +1380,13 @@ INCLUDEPATH += \
     src/VideoStreaming
 
 HEADERS += \
-    src/VideoStreaming/VideoItem.h \
     src/VideoStreaming/VideoReceiver.h \
     src/VideoStreaming/VideoStreaming.h \
-    src/VideoStreaming/VideoSurface.h \
-    src/VideoStreaming/VideoSurface_p.h \
     src/VideoStreaming/SubtitleWriter.h \
 
 SOURCES += \
-    src/VideoStreaming/VideoItem.cc \
     src/VideoStreaming/VideoReceiver.cc \
     src/VideoStreaming/VideoStreaming.cc \
-    src/VideoStreaming/VideoSurface.cc \
     src/VideoStreaming/SubtitleWriter.cc \
 
 contains (CONFIG, DISABLE_VIDEOSTREAMING) {

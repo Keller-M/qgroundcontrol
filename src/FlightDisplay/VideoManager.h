@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- *   (c) 2009-2019 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
+ * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
  * QGroundControl is licensed according to the terms in the file
  * COPYING.md in the root of the source code directory.
@@ -103,6 +103,11 @@ protected slots:
     void _connectionLostChanged     (bool connectionLost);
 
 protected:
+    friend class FinishVideoInitialization;
+#if defined(QGC_GST_STREAMING)
+    GstElement* _makeVideoSink      (const QString& widgetName);
+#endif
+    void _initVideo                 ();
     void _updateSettings            ();
 
 protected:

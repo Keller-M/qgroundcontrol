@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- *   (c) 2009-2016 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
+ * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
  * QGroundControl is licensed according to the terms in the file
  * COPYING.md in the root of the source code directory.
@@ -527,10 +527,9 @@ void LogDownloadController::downloadToDirectory(const QString& dir)
     //-- Stop listing just in case
     _receivedAllEntries();
     //-- Reset downloads, again just in case
-    if(_downloadData) {
-        delete _downloadData;
-        _downloadData = 0;
-    }
+    delete _downloadData;
+    _downloadData = nullptr;
+
     _downloadPath = dir;
     if(!_downloadPath.isEmpty()) {
         if(!_downloadPath.endsWith(QDir::separator()))
@@ -573,10 +572,9 @@ LogDownloadController::_getNextSelected()
 bool
 LogDownloadController::_prepareLogDownload()
 {
-    if(_downloadData) {
-        delete _downloadData;
-        _downloadData = nullptr;
-    }
+    delete _downloadData;
+    _downloadData = nullptr;
+
     QGCLogEntry* entry = _getNextSelected();
     if(!entry) {
         return false;

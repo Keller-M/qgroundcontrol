@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- *   (c) 2009-2016 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
+ * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
  * QGroundControl is licensed according to the terms in the file
  * COPYING.md in the root of the source code directory.
@@ -26,6 +26,7 @@
 #include <QStringListModel>
 #include <QRegularExpression>
 #include <QFontDatabase>
+#include <QQuickWindow>
 
 #ifdef QGC_ENABLE_BLUETOOTH
 #include <QBluetoothLocalDevice>
@@ -68,7 +69,6 @@
 #include "CoordinateVector.h"
 #include "PlanMasterController.h"
 #include "VideoManager.h"
-#include "VideoSurface.h"
 #include "VideoReceiver.h"
 #include "LogDownloadController.h"
 #if defined(QGC_ENABLE_MAVLINK_INSPECTOR)
@@ -127,6 +127,22 @@
 #endif
 
 #include "QGCMapEngine.h"
+
+class FinishVideoInitialization : public QRunnable
+{
+public:
+  FinishVideoInitialization(VideoManager* manager)
+      : _manager(manager)
+  {}
+
+  void run () {
+      _manager->_initVideo();
+  }
+
+private:
+  VideoManager* _manager;
+};
+
 
 QGCApplication* QGCApplication::_app = nullptr;
 
@@ -455,7 +471,6 @@ void QGCApplication::_shutdown()
     // Close out all Qml before we delete toolbox. This way we don't get all sorts of null reference complaints from Qml.
     delete _qmlAppEngine;
 
-    shutdownVideoStreaming();
     delete _toolbox;
 }
 
@@ -560,6 +575,13 @@ bool QGCApplication::_initForNormalAppBoot()
     QSettings settings;
 
     _qmlAppEngine = toolbox()->corePlugin()->createRootWindow(this);
+
+    QQuickWindow* rootWindow = (QQuickWindow*)qgcApp()->mainRootWindow();
+
+    if (rootWindow) {
+        rootWindow->scheduleRenderJob (new FinishVideoInitialization (toolbox()->videoManager()),
+                QQuickWindow::BeforeSynchronizingStage);
+    }
 
     // Safe to show popup error messages now that main window is created
     UASMessageHandler* msgHandler = qgcApp()->toolbox()->uasMessageHandler();
