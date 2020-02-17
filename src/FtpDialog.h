@@ -17,7 +17,7 @@ explicit FtpDialog(QObject *parent = 0);
 
 public slots:
 void connectClicked();
-//void ftpFinished(int, bool);
+void ftpCommandFinished(int, bool);
 void downloadContent();
 void getFileList();
 void closeFTP();

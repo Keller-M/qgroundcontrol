@@ -19,6 +19,7 @@ void FtpDialog::connectClicked()
 
  ftp.connectToHost("ftp.dlptest.com");
  ftp.login("dlpuser@dlptest.com","SzMf7rTE4pCrf9dV286GuNe4N");
+
 // ui->statusLabel->setText(tr("Connecting to host..."));
 }
 
@@ -51,7 +52,7 @@ void FtpDialog::closeFTP()
 
 }
 
-/*void FtpDialog::ftpFinished(int request, bool error)
+void FtpDialog::ftpCommandFinished(int /*request*/, bool error)
 {
 // Handle errors depending on the command caussing it
 qDebug()<<ftp.currentCommand();
@@ -109,12 +110,13 @@ ftp.login();
         break;
     case QFtp::Get:
         file->close();
+        delete file;
         break;
 
     }
 }
 }
-*/
+
 void FtpDialog::getFileList()
 {
 

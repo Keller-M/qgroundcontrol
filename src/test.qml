@@ -154,6 +154,10 @@ Rectangle {
         font.pixelSize: 20
     }
 
+    FtpWindow{
+        id: mywindow
+    }
+
     FtpDialog{
         id: myobject
     }

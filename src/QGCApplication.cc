@@ -28,6 +28,7 @@
 #include <QFontDatabase>
 #include <QQuickWindow>
 #include "FtpDialog.h"
+//#include "ftpwindow.h"
 
 #ifdef QGC_ENABLE_BLUETOOTH
 #include <QBluetoothLocalDevice>
@@ -498,6 +499,7 @@ void QGCApplication::_initCommon()
     //QScopedPointer<QApplication> app(createApplication)
 
     qmlRegisterType<FtpDialog>("com.myself", 1, 0, "FtpDialog");
+    //qmlRegisterType<FtpWindow>("com.myself", 1, 0, "FtpWindow");
 
     qmlRegisterUncreatableType<Vehicle>                 (kQGCVehicle,                       1, 0, "Vehicle",                    kRefOnly);
     qmlRegisterUncreatableType<MissionManager>          (kQGCVehicle,                       1, 0, "MissionManager",             kRefOnly);
