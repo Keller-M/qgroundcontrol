@@ -154,9 +154,9 @@ Rectangle {
         font.pixelSize: 20
     }
 
-    FtpWindow{
+    /*FtpWindow{
         id: mywindow
-    }
+    }*/
 
     FtpDialog{
         id: myobject
@@ -219,7 +219,29 @@ Rectangle {
         x: 438
         y: 106
         text: qsTr("Stop Radio")
+        onClicked:
+            myobject.uploadContent()
     }
+
+
+    Button {
+        id: dowloadFtpButton
+        x: 352
+        y: 106
+        text: qsTr("Download")
+        onClicked:
+            myobject.downloadContent()
+    }
+
+    Button {
+        id: uploadFtpButton
+        x: 438
+        y: 106
+        text: qsTr("Upload")
+        onClicked:
+            myobject.uploadContent()
+    }
+
 
     Text {
         id: connectionStatusLabel

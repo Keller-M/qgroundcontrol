@@ -1,12 +1,16 @@
 #include "FtpDialog.h"
 #include <QDebug>
+#include <QtNetwork>
+
+
 
 
 FtpDialog::FtpDialog(QObject *parent) :
-QObject(parent){}
+QObject(parent), ftp(0){
+    ftp = new QFtp;
+    *curState = QString("NOT YET CONNECTED");
+}
 
-
-QFile *file;
 
 FtpDialog::~FtpDialog()
 {
@@ -15,109 +19,214 @@ FtpDialog::~FtpDialog()
 
 void FtpDialog::connectClicked()
 {
-//ui->connectButton->setEnabled(false);
 
- ftp.connectToHost("ftp.dlptest.com");
- ftp.login("dlpuser@dlptest.com","SzMf7rTE4pCrf9dV286GuNe4N");
+ ftp->connectToHost("ftp.dlptest.com");
+ ftp->login("dlpuser@dlptest.com","SzMf7rTE4pCrf9dV286GuNe4N");
 
-// ui->statusLabel->setText(tr("Connecting to host..."));
+ connect(ftp, SIGNAL(dataTransferProgress(qint64, qint64)),
+         this, SLOT(my_dataTransferProgress(qint64,qint64)));
+
+ connect(ftp, SIGNAL(commandStarted(int)),
+         this, SLOT(my_commandStarted(int)));
+
+ connect(ftp, SIGNAL(commandFinished(int, bool)),
+         this, SLOT(my_commandFinished(int, bool)));
+
+ connect(ftp, SIGNAL(done(bool)),
+         this, SLOT(my_done(bool)));
+
+ connect(ftp, SIGNAL(stateChanged(int)),
+         this, SLOT(my_stateChanged(int)));
+
+ connect(ftp, SIGNAL(listInfo(QUrlInfo)),
+         this, SLOT(my_listInfo(QUrlInfo)));
+
 }
 
 void FtpDialog::downloadContent()
 {
-    file = new QFile(QString("C:/Users/Keller/%1").arg(QString("testFile.txt")));
-    if (!file->open(QIODevice::WriteOnly)) {
+    //connect(ftp, SIGNAL(commandFinished(int,bool)), &loop, SLOT(quit()));
+
+    localFile = new QFile(QString("C:/Users/Keller/%1").arg(QString("testFile.txt")));
+    if (!localFile->open(QIODevice::WriteOnly)) {
           /*  QMessageBox::information(this, tr("FTP"),
                                      tr("Unable to save the file %1: %2.")
                                      .arg("testFile.txt").arg(file->errorString()));
-            */delete file;
+            */
+
             return;
         }
 
-    ftp.get(QString("testFile.txt"), file);
+
+
+    ftp->get(QString("/testFile.txt"), localFile);
+    qDebug()<<ftp->currentCommand();
+
+
+
+}
+
+void FtpDialog::uploadContent()
+{
+    localFile = new QFile(QString("C:/Users/Keller/%1").arg(QString("uploadFile.txt")));
+    if (!localFile->open(QIODevice::ReadWrite)) {
+          /*  QMessageBox::information(this, tr("FTP"),
+                                     tr("Unable to save the file %1: %2.")
+                                     .arg("testFile.txt").arg(file->errorString()));
+            */
+            return;
+        }
+
+
+
+    qDebug()<<ftp->put(localFile, QString("uploadFile.txt"));
+    qDebug()<<ftp->currentCommand();
+
+
 
 }
 
 void FtpDialog::closeFTP()
 {
-    if(ftp.currentCommand() == QFtp::Get)
+    if(ftp->currentCommand() == QFtp::Get)
     {
     }
     else
     {
-        file->close();
-        ftp.close();
+        ftp->close();
     }
 
 
 }
 
-void FtpDialog::ftpCommandFinished(int /*request*/, bool error)
+void FtpDialog::ftpCommandFinished(int request, bool error)
 {
-// Handle errors depending on the command caussing it
-qDebug()<<ftp.currentCommand();
-if(error)
-{
-switch(ftp.currentCommand())
-{
-case QFtp::ConnectToHost:
-//QMessageBox::warning(this, tr("Error"), tr("Failed to connect to host."));
-//ui->connectButton->setEnabled(true);
-
-        break;
-    case QFtp::Login:
-  //      QMessageBox::warning(this, tr("Error"), tr("Failed to login."));
-    //    ui->connectButton->setEnabled(true);
-
-        break;
-
-    case QFtp::List:
-        //QMessageBox::warning(this, tr("Error"),
-     //                        tr("Failed to get file list.\nClosing connection"));
-        ftp.close();
-
-        break;
-
+    // Handle errors depending on the command causing it
+    if(error)
+    {
+        qDebug() << QString("FTP request %1 returned: '%2'")
+                    .arg(request)
+                    .arg(ftp->errorString());
     }
-
-   // ui->statusLabel->setText(tr("Ready."));
-}
-// React to the current command and issue
-// more commands or update the user interface
-else
-{
-switch(ftp.currentCommand())
-{
-case QFtp::ConnectToHost:
-ftp.login();
-
-        break;
-    case QFtp::Login:
-        getFileList();
-
-        break;
-
-    case QFtp::Close:
-        //ui->connectButton->setEnabled(true);
-       // getFileList();
-
-        break;
-    case QFtp::List:
-        //ui->disconnectButton->setEnabled(true);
-        //ui->upButton->setEnabled(true);
-        //ui->statusLabel->setText(tr("Ready."));
-
-        break;
-    case QFtp::Get:
-        file->close();
-        delete file;
-        break;
-
+    else
+    {
+        if(ftp->currentCommand() == QFtp::List)
+        {
+            fetchFtpList();
+        }
+        if(ftp->currentCommand() == QFtp::Get)
+        {
+            localFile->close();
+        }
     }
 }
-}
-
-void FtpDialog::getFileList()
+/*
+void FtpDialog::fetchFtpList()
 {
+    qDebug() << Q_FUNC_INFO << "Entering...";
+        if(!ftpFileList->isEmpty())
+        {
+            QString item = ftpFileList->takeFirst();
+            QString img_local_path = QString(photoDir->path().append("/%1").arg(item));
+            localFile = new QFile(img_local_path);
+
+            if(!localFile->open(QIODevice::WriteOnly))
+            {
+                delete localFile;
+                return;
+            }
+
+            QString ftp_file = QString("/%1").arg(item);
+            ftp->get(ftp_file, localFile);
+        }
 
 }
+*/
+
+void FtpDialog::my_dataTransferProgress(qint64 downloaded, qint64 total)
+{
+    qDebug() << QString("Downloaded %1 bytes out of %2.")
+                .arg(downloaded)
+                .arg(total);
+}
+
+void FtpDialog::my_commandStarted(int command)
+{
+    qDebug() << QString("Launched command %1.")
+                .arg(command);
+}
+
+
+void FtpDialog::my_done(bool error)
+{
+    if(error)
+    {
+        qDebug() << Q_FUNC_INFO << QString("FTP_ERROR: '%1'").arg(ftp->errorString());
+    }
+}
+
+void FtpDialog::my_stateChanged(int state)
+{
+    QString text;
+    switch (state)
+    {
+        case 0:
+            text = "QFtp::Unconnected";
+            break;
+        case 1:
+            text = "QFtp::HostLookup";
+            break;
+        case 2:
+            text = "QFtp::Connecting";
+            break;
+        case 3:
+            text = "QFtp::Connected";
+            break;
+        case 4:
+            text = "QFtp::LoggingIn";
+            break;
+        case 5:
+            text = "QFtp::Closing";
+            break;
+        default:
+            text = "UNKNOWN STATUS!";
+            break;
+    }
+    qDebug() << Q_FUNC_INFO << QString("FTP STATUS changed: '%1'").arg(text);
+
+    *curState = QString(text);
+
+}
+
+void FtpDialog::my_listInfo(QUrlInfo url)
+{
+    ftpFileList->append(url.name());
+}
+
+void FtpDialog::fetchFtpList()
+{
+    qDebug() << Q_FUNC_INFO << "Entering...";
+       if(!ftpFileList->isEmpty())
+       {
+           QString item = ftpFileList->takeFirst();
+           QString img_local_path = QString(photoDir->path().append("/%1").arg(item));
+           localFile = new QFile(img_local_path);
+
+           if(!localFile->open(QIODevice::WriteOnly))
+           {
+               delete localFile;
+               return;
+           }
+
+           QString ftp_file = QString("/%1").arg(item);
+           ftp->get(ftp_file, localFile);
+       }
+}
+
+/*
+QString getState()
+{
+    return QString("current state");//*curState;
+}*/
+
+
