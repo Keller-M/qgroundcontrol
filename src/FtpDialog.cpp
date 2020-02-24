@@ -1,6 +1,6 @@
 #include "FtpDialog.h"
 #include <QDebug>
-
+#include <QFile>
 
 FtpDialog::FtpDialog(QObject *parent) :
 QObject(parent){}
