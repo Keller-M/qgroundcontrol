@@ -8,7 +8,6 @@
 FtpDialog::FtpDialog(QObject *parent) :
 QObject(parent), ftp(0){
     ftp = new QFtp;
-    *curState = QString("NOT YET CONNECTED");
 }
 
 
@@ -30,7 +29,7 @@ void FtpDialog::connectClicked()
          this, SLOT(my_commandStarted(int)));
 
  connect(ftp, SIGNAL(commandFinished(int, bool)),
-         this, SLOT(my_commandFinished(int, bool)));
+         this, SLOT(ftpCommandFinished(int, bool)));
 
  connect(ftp, SIGNAL(done(bool)),
          this, SLOT(my_done(bool)));
@@ -46,8 +45,14 @@ void FtpDialog::connectClicked()
 void FtpDialog::downloadContent()
 {
     //connect(ftp, SIGNAL(commandFinished(int,bool)), &loop, SLOT(quit()));
+    QWidget *parent = 0;
+    QString fileName;
+    fileName = QFileDialog::getSaveFileName(parent, tr("Save File"),
+                                        "ftp://dlpuser@dlptest.com:SzMf7rTE4pCrf9dV286GuNe4N@ftp.dlptest.com/uploadFile.txt"
+                                        );
 
-    localFile = new QFile(QString("C:/Users/Keller/%1").arg(QString("testFile.txt")));
+    //localFile = new QFile(QString("C:/Users/Keller/%1").arg(QString("testFile.txt")));
+    localFile = new QFile(QString("ftp://dlpuser@dlptest.com:SzMf7rTE4pCrf9dV286GuNe4N@ftp.dlptest.com/uploadFile.txt"));
     if (!localFile->open(QIODevice::WriteOnly)) {
           /*  QMessageBox::information(this, tr("FTP"),
                                      tr("Unable to save the file %1: %2.")
@@ -59,7 +64,9 @@ void FtpDialog::downloadContent()
 
 
 
-    ftp->get(QString("/testFile.txt"), localFile);
+    ftp->get(fileName, localFile);
+    qDebug()<<"test output";
+    qDebug()<<ftp->get(fileName, localFile);
     qDebug()<<ftp->currentCommand();
 
 
@@ -194,7 +201,6 @@ void FtpDialog::my_stateChanged(int state)
     }
     qDebug() << Q_FUNC_INFO << QString("FTP STATUS changed: '%1'").arg(text);
 
-    *curState = QString(text);
 
 }
 

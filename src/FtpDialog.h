@@ -15,7 +15,6 @@ public:
 QFile *localFile;
 QStringList *ftpFileList;
 QDir *photoDir;
-QString *curState;
 explicit FtpDialog(QObject *parent = 0);
 ~FtpDialog();
 
