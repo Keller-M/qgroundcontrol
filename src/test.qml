@@ -8,8 +8,6 @@ import QGroundControl.Palette 1.0
 
 import com.myself 1.0
 
-//import qgroundcontrol.Sources.src.myconfig_manager 1.0
-
 Rectangle {
     id: rectangle
 
@@ -360,7 +358,7 @@ Rectangle {
         y: 43
         text: qsTr("Connect")
         onClicked: {
-            myobject.connectClicked()
+            myobject.connectClicked(ipInput.text)
         }
 
     }
@@ -403,7 +401,7 @@ Rectangle {
     Button {
         id: startRadioButton
         x: 864
-        y: 106
+        y: 124
         text: qsTr("Start Radio")
         anchors.rightMargin: 976
         onClicked:
@@ -413,7 +411,7 @@ Rectangle {
     Button {
         id: stopRadioButton
         x: 950
-        y: 106
+        y: 124
         text: qsTr("Stop Radio")
         anchors.rightMargin: 976
     }
@@ -421,7 +419,7 @@ Rectangle {
 
     Button {
         id: dowloadFtpButton
-        x: 352
+        x: 864
         y: 106
         text: qsTr("Download")
         onClicked:
@@ -430,7 +428,7 @@ Rectangle {
 
     Button {
         id: uploadFtpButton
-        x: 438
+        x: 950
         y: 106
         text: qsTr("Upload")
         onClicked:
@@ -444,6 +442,16 @@ Rectangle {
         y: 47
         color: "#ffffff"
         text: qsTr("Connection Status")
+        anchors.rightMargin: 976
+        font.pixelSize: 12
+    }
+
+    TextField {
+        id: ipInput
+        objectName: "ipInput"
+        x: 1083
+        y: 47
+        text: qsTr("ftp.dlptest.com")
         anchors.rightMargin: 976
         font.pixelSize: 12
     }
@@ -509,11 +517,14 @@ Rectangle {
 
     TextArea {
         id: terminalArea
+        objectName: "testOutput"
         x: 864
         y: 154
         width: 320
         height: 602
         anchors.rightMargin: 976
+        text: myobject.logFile
+
     }
 
     Text {
