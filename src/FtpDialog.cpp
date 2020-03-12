@@ -103,6 +103,7 @@ void FtpDialog::downloadContent()
     qDebug() << myUrl;
     QUrl myFile;
 
+    ftp->setTransferMode(QFtp::Active);
     /* Still trying to get the ftp to show in the dialog.
      * There is some issue with the WindowsNativeFileDialog, may need to find
      * a way to use QGC's custom dialog and still be able to get an ftp connection
