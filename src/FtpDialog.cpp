@@ -97,8 +97,10 @@ void FtpDialog::downloadContent()
 {
     QWidget *prnt = nullptr;
     QString fileName;
-    QUrl myUrl = QUrl::fromUserInput("ftp://dlpuser@dlptest.com:SzMf7rTE4pCrf9dV286GuNe4N@ftp.dlptest.com");
+    QFileDialog myDialog;
+    QUrl myUrl = QUrl("ftp://ftp.dlptest.com");
     myUrl.setScheme("ftp");
+    qDebug() << myUrl;
     QUrl myFile;
 
     /* Still trying to get the ftp to show in the dialog.
@@ -108,7 +110,9 @@ void FtpDialog::downloadContent()
      */
 //    fileName = QFileDialog::getOpenFileName(this, tr("Save File"),
 //                                       myUrl);
-    myFile = QFileDialog::getOpenFileUrl(prnt, tr("Save File"), myUrl);
+    myDialog.setDirectory(myUrl.toString());
+    //qDebug() << ;
+    myFile = myDialog.getOpenFileUrl(prnt, tr("Save File"));
 
     //Makes sure that the file we are trying to get actually exists.
     localFile = new QFile(myFile.fileName());
