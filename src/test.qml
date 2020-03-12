@@ -42,7 +42,7 @@ Rectangle {
       Function: Takes in the currently inputted text from the text
                 fields and creates a configuration file with them.
     */
-    function saveFile(fileUrl, text_fv, text_rf, text_if, text_bb, text_pd, text_pr, text_notes) {
+    function saveFile(fileUrl, text_rsr, text_fveh, text_fv, text_rf, text_if, text_bb, text_pd, text_pr, text_notes) {
         var request = new XMLHttpRequest();
         request.open("PUT", fileUrl, false);
 
@@ -57,15 +57,15 @@ Rectangle {
         //file = file + "Time" + year + "/" + month + "/" + day +"\n";
         file = file + date.toLocaleString() + "\n\n";
         file = file + "//SDRSYS\n";
-        file = file + "FVEH  " + text_fv + "\n";
+        file = file + "FVEH  " + text_fveh + "\n";
         file = file + "RFG  " + text_rf + "\n";
         file = file + "IFG  " + text_if + "\n";
         file = file + "BBG  " + text_bb + "\n";
         file = file + "\n";
         file += "//TAG\n";
         file += "Num  1\n";
-        file += "FT  " + "\n";
-        file += "FRS  " + "\n";
+        file += "FT  " + text_fv + "\n";
+        file += "FRS  " + text_rsr + "\n";
         file += "PD  " + text_pd + "\n";
         file += "PR  " + text_pr + "\n";
 
@@ -148,8 +148,48 @@ Rectangle {
 
     FileDialog {
         id: openFileDialog
-        nameFilters: ["Text Files (*.txt)", "All files (*)"]
-        onAccepted: textEdit.text = openFile(openFileDialog.fileUrl)
+        nameFilters: ["Text Files (*.txt)", "FTP Files (*.ftp)", "All files (*)"]
+        onAccepted: /*flightNotes.text = openFile(openFileDialog.fileUrl)*/ {
+            //Create Request
+            var request = new XMLHttpRequest();
+            request.open("GET", fileUrl, false);
+            request.send(null);
+
+            //Start parsing the file
+            var file = request.responseText;
+            var lines = file.split("\n");
+            console.log(lines);
+            var remake = "";
+            var iterator;
+            for (iterator = 0; iterator < lines.length; iterator++) {
+                if(lines[iterator].substring(0,1) === "" && (iterator !== lines.length-1)) {
+                    //console.log("Removing solo newlines.");
+                    iterator++;
+                }
+                if(lines[iterator].substring(0,2) === "//") {
+                    //console.log("Removing comment.");
+                    iterator++;
+                }
+                remake += lines[iterator];
+                remake += "\n";
+                //console.log("IN loop");
+            }
+            console.log(remake)
+            console.log("XX")
+            var reremake = remake.split("\n")
+            console.log(reremake)
+            console.log("XXX")
+            console.log(reremake[0])
+            flightNotes.text = reremake[10]
+            rfGain.text = (reremake[2].split(" "))[2]
+            ifGain.text = (reremake[3].split(" "))[2]
+            bbGain.text = (reremake[4].split(" "))[2]
+            pulseDuration.text = (reremake[8].split(" "))[2]
+            pulseRepetition.text = (reremake[9].split(" "))[2]
+            tagFreq.text = (reremake[6].split(" "))[2]
+            uavTelemetrySampleRate.text = (reremake[7].split(" "))[2]
+            radioSamplingRate.text = (reremake[1].split(" "))[2]
+        }
     }
 
     /* TESTING */
@@ -166,8 +206,8 @@ Rectangle {
     FileDialog {
         id: saveFileDialog
         selectExisting: false
-        nameFilters: ["Text Files (*.txt)", "All files (*)"]
-        onAccepted: saveFile(saveFileDialog.fileUrl, tagFreq.text, rfGain.text, ifGain.text, bbGain.text, pulseDuration.text, pulseReptition.text, flightNotes.text)
+        nameFilters: ["Text Files (*.txt)", "FTP Files (*.ftp)", "All files (*)"]
+        onAccepted: saveFile(saveFileDialog.fileUrl, radioSamplingRate.text, uavTelemetrySampleRate.text, tagFreq.text, rfGain.text, ifGain.text, bbGain.text, pulseDuration.text, pulseRepetition.text, flightNotes.text)
     }
 
 
@@ -275,12 +315,12 @@ Rectangle {
         Text {
             id: pulseRepetitionLabel
             color: "#ffffff"
-            text: qsTr("Pulse Reptition Rate (s)")
+            text: qsTr("Pulse Repetition Rate (s)")
             font.pixelSize: 12
         }
 
         TextField {
-            id: pulseReptition
+            id: pulseRepetition
             placeholderText: qsTr("Text Field")
         }
 
@@ -365,6 +405,7 @@ Rectangle {
 
     Button {
         id: importSettingsButton
+        onClicked: openFileDialog.open()
         x: 592
         y: 449
         text: qsTr("Import Settings")
