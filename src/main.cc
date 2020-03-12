@@ -29,6 +29,7 @@
 #include "QGCApplication.h"
 #include "AppMessages.h"
 
+
 #ifndef __mobile__
     #include "QGCSerialPortInfo.h"
     #include "RunGuard.h"
@@ -229,6 +230,10 @@ int main(int argc, char *argv[])
 {
 #ifndef __mobile__
     RunGuard guard("QGroundControlRunGuardKey");
+
+    //SHAFER EDIT
+    //qmlRegisterType<MyUDP>("com.company.myudp", 1,0,"Udp");
+
     if (!guard.tryToRun()) {
         // QApplication is necessary to use QMessageBox
         QApplication errorApp(argc, argv);
