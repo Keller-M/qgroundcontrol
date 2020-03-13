@@ -42,7 +42,7 @@ QString FtpDialog::getLogFile()
  */
 void FtpDialog::setLogFile(const QString &logFile)
 {
-    m_logFile = logFile;
+    m_logFile = logFile +"\n";
     emit textChanged();
 }
 
@@ -97,13 +97,17 @@ void FtpDialog::downloadContent()
 {
     QWidget *prnt = nullptr;
     QString fileName;
-    QFileDialog myDialog;
-    QUrl myUrl = QUrl("ftp://ftp.dlptest.com");
+    //QFileDialog myDialog;
+    QUrl myUrl;
     myUrl.setScheme("ftp");
-    qDebug() << myUrl;
+    myUrl.setHost("ftp.dlptest.com");
+    myUrl.setUserName("dlpuser@dlptest.com");
+    myUrl.setPassword("SzMf7rTE4pCrf9dV286GuNe4N");
+    qDebug() << tr("myUrl OUTPUT") << myUrl;
+    //qDebug() << tr("QFILE OUTPUT") << QFileInfo::QFileInfo();
     QUrl myFile;
 
-    ftp->setTransferMode(QFtp::Active);
+
     /* Still trying to get the ftp to show in the dialog.
      * There is some issue with the WindowsNativeFileDialog, may need to find
      * a way to use QGC's custom dialog and still be able to get an ftp connection
@@ -111,28 +115,33 @@ void FtpDialog::downloadContent()
      */
 //    fileName = QFileDialog::getOpenFileName(this, tr("Save File"),
 //                                       myUrl);
-    myDialog.setDirectory(myUrl.toString());
+//    myDialog.setDirectory(myUrl.toString());
     //qDebug() << ;
-    myFile = myDialog.getOpenFileUrl(prnt, tr("Save File"));
+    myFile = QFileDialog::getOpenFileUrl(prnt, tr("Save File"), myUrl, "All (*.*);;Text files (*.txt)");
+
+    qDebug() << tr("myFile OUTPUT:") << myFile.fileName();
 
     //Makes sure that the file we are trying to get actually exists.
     localFile = new QFile(myFile.fileName());
-    if (!localFile->open(QIODevice::WriteOnly))
+    if (!localFile->open(QIODevice::ReadWrite))
     {
+        qDebug() << tr("------------FILE NOT OPEN-----------------");
         delete localFile;
         return;
     }
 
+    qDebug() << tr("LOCAL FILE-----") << localFile->fileName();
+
     ftp->get(myFile.fileName(), localFile);
 
     //Add action to the log
-    m_logFile.append(ftp->get(myFile.fileName(), localFile));
+    m_logFile.append(ftp->get(myFile.fileName()+"\n", localFile));
     m_logFile.append(ftp->currentCommand());
     setLogFile(m_logFile);
 
     //Debug output
-    qDebug()<<ftp->get(myFile.fileName(), localFile);
-    qDebug()<<ftp->currentCommand();
+//    qDebug()<<ftp->get(myFile.fileName(), localFile);
+//    qDebug()<<ftp->currentCommand();
 
 
 
@@ -146,14 +155,16 @@ void FtpDialog::downloadContent()
  */
 void FtpDialog::uploadContent()
 {
+    QUrl myFile = QFileDialog::getSaveFileUrl();
     //Makes sure the file we are trying to upload exists
-    localFile = new QFile(QString("C:/Users/Keller/%1").arg(QString("uploadFile.txt")));
+    localFile = new QFile(myFile.fileName());
     if (!localFile->open(QIODevice::ReadWrite))
     {
         delete localFile;
         return;
     }
 
+    ftp->put(localFile, myFile.fileName());
 
     //Add action to the log
     m_logFile.append(ftp->put(localFile, QString("uploadFile.txt")));
