@@ -7,6 +7,7 @@ import QGroundControl.FactControls 1.0
 import QGroundControl.Palette 1.0
 
 import com.myself 1.0
+import com.udp 1.0
 
 Rectangle {
     id: rectangle
@@ -83,69 +84,6 @@ Rectangle {
       Function: Takes in a configuration file and replaces the textfields
                 within the GUI with the corresponding text from the file.
     */
-    function openFileTest(fileUrl) {
-        //Create Request
-        var request = new XMLHttpRequest();
-        request.open("GET", fileUrl, false);
-        request.send(null);
-
-        //Start parsing the file
-        var file = request.responseText;
-        var lines = file.split("\n");
-        console.log(lines);
-        var remake = "";
-        var iterator;
-        for (iterator = 0; iterator < lines.length; iterator++) {
-            if(lines[iterator].substring(0,1) === "" && (iterator !== lines.length-1)) {
-                //console.log("Removing solo newlines.");
-                iterator++;
-            }
-            if(lines[iterator].substring(0,2) === "//") {
-                //console.log("Removing comment.");
-                iterator++;
-            }
-            remake += lines[iterator];
-            remake += "\n";
-            //console.log("IN loop");
-        }
-        var secondIter;
-        for (iterator = 0; iterator < resplit.length; iterator++) {
-            var curString = resplit[iterator];
-            if (curString.subString(0,5) === "FVEH") {
-
-            }
-            else if (curString.subString(0,4) === "RFG") {
-
-            }
-            else if (curString.subString(0,4) === "IFG") {
-
-            }
-            else if (curString.subString(0,4) === "BBG") {
-
-            }
-            else if (curString.subString(0,4) === "FRS") {
-
-            }
-            else if (curString.subString(0,3) === "FT") {
-
-            }
-            else if (curString.subString(0,3) === "PD") {
-
-            }
-            else if (curString.subString(0,4) === "PR") {
-
-            }
-        }
-    }
-
-    /*
-    function saveMultipleText(fileUrl, text, text_two, text_three) {
-        var request = new XMLHttpRequest();
-        request.open("PUT", fileUrl, false);
-        request.send(text + text_two + text_three);
-        return request.status;
-    }*/
-
     FileDialog {
         id: openFileDialog
         nameFilters: ["Text Files (*.txt)", "FTP Files (*.ftp)", "All files (*)"]
@@ -392,6 +330,10 @@ Rectangle {
         id: myobject
     }
 
+    MyUdp{
+        id: udpObject
+    }
+
     Button {
         id: connectFTPButton
         x: 864
@@ -564,8 +506,7 @@ Rectangle {
         width: 320
         height: 602
         anchors.rightMargin: 976
-        text: myobject.logFile
-
+        text: udpObject.logFile
     }
 
     Text {
@@ -617,6 +558,7 @@ Rectangle {
         y: 826
         text: "Snap Window"
         anchors.rightMargin: 976
+        onClicked: udpObject.HelloUDP();
     }
 
 
