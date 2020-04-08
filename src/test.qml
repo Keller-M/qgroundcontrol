@@ -327,7 +327,7 @@ Rectangle {
 
 
     FtpDialog{
-        id: myobject
+        id: ftpObject
     }
 
     MyUdp{
@@ -340,7 +340,7 @@ Rectangle {
         y: 43
         text: qsTr("Connect")
         onClicked: {
-            myobject.connectClicked(ipInput.text)
+            ftpObject.connectClicked(ipInput.text)
         }
 
     }
@@ -360,7 +360,7 @@ Rectangle {
         text: qsTr("Disconnect")
         anchors.rightMargin: 976
         onClicked:{
-            myobject.closeFTP()
+            ftpObject.closeFTP()
         }
     }
 
@@ -388,7 +388,7 @@ Rectangle {
         text: qsTr("Start Radio")
         anchors.rightMargin: 976
         onClicked:
-            myobject.downloadContent()
+            ftpObject.downloadContent()
     }
 
     Button {
@@ -406,7 +406,7 @@ Rectangle {
         y: 106
         text: qsTr("Download")
         onClicked:
-            myobject.downloadContent()
+            ftpObject.downloadContent()
     }
 
     Button {
@@ -415,7 +415,7 @@ Rectangle {
         y: 106
         text: qsTr("Upload")
         onClicked:
-            myobject.uploadContent()
+            ftpObject.uploadContent()
     }
 
 
@@ -504,9 +504,20 @@ Rectangle {
         x: 864
         y: 154
         width: 320
-        height: 602
+        height: 300
         anchors.rightMargin: 976
         text: udpObject.logFile
+    }
+
+    TextArea {
+        id: ftpTerminalArea
+        objectName: "testOutput"
+        x: 864
+        y: 460
+        width: 320
+        height: 300
+        anchors.rightMargin: 976
+        text: ftpObject.logFile
     }
 
     Text {

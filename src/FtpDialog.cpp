@@ -15,6 +15,7 @@ FtpDialog::~FtpDialog()
 {
     //Used to clear UI, but ours is removed by QGC. May need later
     //delete ui;
+
 }
 
 
@@ -59,9 +60,9 @@ void FtpDialog::connectClicked(QString input)
     ftp->connectToHost(input);
 
     //Required login for the default IP address
-    if(input == "ftp.dlptest.com")
+    if(input == "10.42.0.1")
     {
-        ftp->login("dlpuser@dlptest.com","SzMf7rTE4pCrf9dV286GuNe4N");
+        ftp->login("rampart","rampart");
     }
 
     connect(ftp, SIGNAL(dataTransferProgress(qint64, qint64)),
@@ -100,9 +101,9 @@ void FtpDialog::downloadContent()
     //QFileDialog myDialog;
     QUrl myUrl;
     myUrl.setScheme("ftp");
-    myUrl.setHost("ftp.dlptest.com");
-    myUrl.setUserName("dlpuser@dlptest.com");
-    myUrl.setPassword("SzMf7rTE4pCrf9dV286GuNe4N");
+    myUrl.setHost("10.42.0.1");
+    myUrl.setUserName("rampart");
+    myUrl.setPassword("rampart");
     qDebug() << tr("myUrl OUTPUT") << myUrl;
     //qDebug() << tr("QFILE OUTPUT") << QFileInfo::QFileInfo();
     QUrl myFile;
@@ -134,17 +135,6 @@ void FtpDialog::downloadContent()
 
     ftp->get(myFile.fileName(), localFile);
 
-    //Add action to the log
-    m_logFile.append(ftp->get(myFile.fileName()+"\n", localFile));
-    m_logFile.append(ftp->currentCommand());
-    setLogFile(m_logFile);
-
-    //Debug output
-//    qDebug()<<ftp->get(myFile.fileName(), localFile);
-//    qDebug()<<ftp->currentCommand();
-
-
-
 }
 
 
@@ -167,10 +157,6 @@ void FtpDialog::uploadContent()
     ftp->put(localFile, myFile.fileName());
 
     //Add action to the log
-    m_logFile.append(ftp->put(localFile, QString("uploadFile.txt")));
-    m_logFile.append(ftp->currentCommand());
-    setLogFile(m_logFile);
-
     //Debug output
     qDebug()<<ftp->put(localFile, QString("uploadFile.txt"));
     qDebug()<<ftp->currentCommand();
@@ -186,13 +172,16 @@ void FtpDialog::uploadContent()
  */
 void FtpDialog::closeFTP()
 {
-    if(ftp->currentCommand() == QFtp::Get)
-    {
-    }
-    else
-    {
-        ftp->close();
-    }
+    ftp->abort();
+    ftp->close();
+    ftp = 0;
+//    if(ftp->currentCommand() == QFtp::Get)
+//    {
+//    }
+//    else
+//    {
+//        ftp->close();
+//    }
 }
 
 
@@ -211,14 +200,9 @@ void FtpDialog::ftpCommandFinished(int request, bool error)
     if(error)
     {
 
-        m_logFile.append(QString("FTP request %1 returned: '%2'")
-                       .arg(request)
-                       .arg(ftp->errorString()));
-        setLogFile(m_logFile);
-
         qDebug() << QString("FTP request %1 returned: '%2'")
-                    .arg(request)
-                    .arg(ftp->errorString());
+                .arg(request)
+                .arg(ftp->errorString());
 
     }
     else
