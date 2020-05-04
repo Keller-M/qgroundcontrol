@@ -1,3 +1,4 @@
+// Generic Imports
 import QtQuick 2.3
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
@@ -6,12 +7,18 @@ import QtQuick.Dialogs 1.2
 import QGroundControl.FactControls 1.0
 import QGroundControl.Palette 1.0
 
+// Import testing library
+// import QtTest 1.12
+
+// Import FTP code
 import com.myself 1.0
+
+// Import UDP Code
 import com.udp 1.0
+
 
 Rectangle {
     id: rectangle
-
 
     /*
       Name: openFile(file)
@@ -112,12 +119,12 @@ Rectangle {
                 remake += "\n";
                 //console.log("IN loop");
             }
-            console.log(remake)
-            console.log("XX")
+            //console.log(remake)
+            //console.log("XX")
             var reremake = remake.split("\n")
-            console.log(reremake)
-            console.log("XXX")
-            console.log(reremake[0])
+            //console.log(reremake)
+            //console.log("XXX")
+            //console.log(reremake[0])
             flightNotes.text = reremake[10]
             rfGain.text = (reremake[2].split(" "))[2]
             ifGain.text = (reremake[3].split(" "))[2]
@@ -394,7 +401,7 @@ Rectangle {
         text: qsTr("Start Radio")
         anchors.rightMargin: 976
         onClicked:
-            ftpObject.downloadContent()
+            udpObject.startUDP()
     }
 
     Button {
@@ -403,6 +410,8 @@ Rectangle {
         y: 478
         text: qsTr("Stop Radio")
         anchors.rightMargin: 976
+        onClicked:
+            udpObject.stopUDP()
     }
 
 
@@ -567,21 +576,110 @@ Rectangle {
         text: "Clear Terminal"
         anchors.rightMargin: 976
     }
-
-    Rectangle {
-        id: rectangle1
-        x: 469
-        y: 446
-        width: 331
-        height: 4
-        color: "#000000"
-    }
-
-
     width: 1920
     height: 1080
-    color: "#cac5c2"
-    // palette.text
+    color: "#161616"
+    // Testing configuration file input
+    /*
+    TestCase {
+        name: "ConfigImportTest"
+
+        function test_Import() {
+            // Formating constant file for testing.
+            var file = "//TS\n";
+            file = file + date.toLocaleString() + "\n\n";
+            file = file + "//SDRSYS\n";
+            file = file + "FVEH 1\n";
+            file = file + "RFG  2\n";
+            file = file + "IFG  3\n";
+            file = file + "BBG  4\n";
+            file = file + "\n";
+            file += "//TAG\n";
+            file += "Num  1\n";
+            file += "FT  5\n";
+            file += "FRS  6\n";
+            file += "PD  7\n";
+            file += "PR  8\n";
+            file += "\n//NOTES\n";
+            file += "Test notes\n";
+
+            // Disasemble configuration file
+            var lines = file.split("\n");
+            console.log(lines);
+            var remake = "";
+            var iterator;
+            for (iterator = 0; iterator < lines.length; iterator++) {
+                if(lines[iterator].substring(0,1) === "" && (iterator !== lines.length-1)) {
+                    //console.log("Removing solo newlines.");
+                    iterator++;
+                }
+                if(lines[iterator].substring(0,2) === "//") {
+                    //console.log("Removing comment.");
+                    iterator++;
+                }
+                remake += lines[iterator];
+                remake += "\n";
+                //console.log("IN loop");
+            }
+            var reremake = remake.split("\n")
+
+            verify(reremake[2].split(" ")[2] === "3", "IFGain check failed.");
+            verify(reremake[3].split(" ")[2] === "2", "RFGain check failed.");
+            verify(reremake[4].split(" ")[2] === "4", "BBGain check failed.");
+            verify(reremake[8].split(" ")[2] === "7", "Pulse Duration check failed.");
+            verify(reremake[9].split(" ")[2] === "8", "Pulse Repetition check failed.");
+            verify(reremake[10].split(" ")[2] === "Test notes", "Notes check failed.");
+            verify(reremake[6].split(" ")[2] === "5", "Tag Frequency check failed.");
+            verify(reremake[1].split(" ")[2] === "1", "Radio Sampling rate check failed.");
+            verify(reremake[7].split(" ")[2] === "6", "Telemetry Sample Ratecheck failed.");
+        }
+    }
+
+    TestCase {
+        name: "ConfigCreateTest"
+        function test_create() {
+            // Generate constant variables for output
+            var text_rsr = 6;
+            var text_fveh = 1;
+            var text_fv = 5;
+            var text_rf = 2;
+            var text_if = 3;
+            var text_bb = 4;
+            var text_pd = 7;
+            var text_pr = 8;
+            var text_notes = "Text notes";
+
+            // Formating constant file for testing.
+            var file = "//TS\n";
+            file = file + date.toLocaleString() + "\n\n";
+            file = file + "//SDRSYS\n";
+            file = file + "FVEH  " + text_fveh + "\n";
+            file = file + "RFG  " + text_rf + "\n";
+            file = file + "IFG  " + text_if + "\n";
+            file = file + "BBG  " + text_bb + "\n";
+            file = file + "\n";
+            file += "//TAG\n";
+            file += "Num  1\n";
+            file += "FT  " + text_fv + "\n";
+            file += "FRS  " + text_rsr + "\n";
+            file += "PD  " + text_pd + "\n";
+            file += "PR  " + text_pr + "\n";
+
+            file += "\n//NOTES\n";
+            file += text_notes + "\n";
+
+            verify(text_rsr === "6", "FRS create failed.");
+            verify(text_fveh === "1", "Frequency create failed.");
+            verify(text_fv === "5", "FV create failed.");
+            verify(text_rf === "2", "RF create failed.");
+            verify(text_if === "3", "IF create failed.");
+            verify(text_bb === "4", "BB create failed.");
+            verify(text_pd === "7", "PR create failed.")
+            verify(text_pr === "8", "RD create failed.")
+            verify(text_notes === "Text notes", "Notes create failed.")
+        }
+    }
+    */
 }
 
 

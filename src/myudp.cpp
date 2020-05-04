@@ -17,10 +17,29 @@ void MyUDP::helloUDP()
 {
     QByteArray Data;
 
-    Data.append("Hello from UDP");
+    Data.append("Starting UDP server.");
 
     socket->writeDatagram(Data, QHostAddress::LocalHost, 1234);
-    m_logFile.append(QString("TESTING\n"));
+    emit textChanged();
+}
+
+void MyUDP::startUDP()
+{
+    QByteArray Data;
+
+    Data.append("//CMD:start");
+
+    socket->writeDatagram(Data, QHostAddress::LocalHost, 1234);
+    emit textChanged();
+}
+
+void MyUDP::stopUDP()
+{
+    QByteArray Data;
+
+    Data.append("//CMD:stop");
+
+    socket->writeDatagram(Data, QHostAddress::LocalHost, 1234);
     emit textChanged();
 }
 
