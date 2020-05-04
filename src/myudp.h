@@ -22,6 +22,8 @@ public slots:
     void readyRead();
     void readIncoming();
     void HelloUDP();
+    void startUDP();
+    void stopUDP();
 private:
     QUdpSocket *socket;
 };

@@ -13,6 +13,7 @@
 #include <QTimer>
 #include <QQmlApplicationEngine>
 #include <QElapsedTimer>
+#include <QtTest>
 
 #include "LinkConfiguration.h"
 #include "LinkManager.h"

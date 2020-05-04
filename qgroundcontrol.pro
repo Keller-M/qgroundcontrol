@@ -25,6 +25,8 @@ TARGET   = QGroundControl
 TEMPLATE = app
 QGCROOT  = $$PWD
 QT += network
+QT += testlib
+CONFIG += qmltestcase
 
 DebugBuild {
     DESTDIR  = $${OUT_PWD}/debug
