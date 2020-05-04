@@ -21,7 +21,7 @@ signals:
 public slots:
     void readyRead();
     void readIncoming();
-    void HelloUDP();
+    void helloUDP();
 private:
     QUdpSocket *socket;
 };
