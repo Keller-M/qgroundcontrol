@@ -1,15 +1,18 @@
 #include "myudp.h"
-
+#include <QHostAddress>
 // myudp.cpp
 
 #include "myudp.h"
+
+QString g_addr = "10.42.0.1";
+QHostAddress g_adddr = QHostAddress(g_addr);
 
 MyUDP::MyUDP(QObject *parent) : QObject(parent)
 {
     socket = new QUdpSocket(this);
 
-    socket->bind(QHostAddress::LocalHost, 1234);
-
+    //socket->bind(QHostAddress::LocalHost, 1234);
+    socket->bind(g_adddr, 9090);
     connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
 }
 
@@ -19,7 +22,8 @@ void MyUDP::HelloUDP()
 
     Data.append("Starting UDP server.");
 
-    socket->writeDatagram(Data, QHostAddress::LocalHost, 1234);
+    //socket->writeDatagram(Data, QHostAddress::LocalHost, 1234);
+    socket->writeDatagram(Data, g_adddr, 9090);
     emit textChanged();
 }
 
@@ -29,7 +33,8 @@ void MyUDP::startUDP()
 
     Data.append("//CMD:start");
 
-    socket->writeDatagram(Data, QHostAddress::LocalHost, 1234);
+    //socket->writeDatagram(Data, QHostAddress::LocalHost, 1234);
+    socket->writeDatagram(Data, g_adddr, 9090);
     emit textChanged();
 }
 
@@ -39,7 +44,8 @@ void MyUDP::stopUDP()
 
     Data.append("//CMD:stop");
 
-    socket->writeDatagram(Data, QHostAddress::LocalHost, 1234);
+    //socket->writeDatagram(Data, QHostAddress::LocalHost, 1234);
+    socket->writeDatagram(Data, g_adddr, 9090);
     emit textChanged();
 }
 
