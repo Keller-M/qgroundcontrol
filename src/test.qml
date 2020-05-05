@@ -450,7 +450,7 @@ Rectangle {
         y: 59
         width: 149
         height: 20
-        text: qsTr("ftp.dlptest.com")
+        text: qsTr("10.42.0.1")
         anchors.rightMargin: 976
         font.pixelSize: 12
     }
