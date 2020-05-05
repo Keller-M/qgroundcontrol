@@ -5,14 +5,15 @@
 #include "myudp.h"
 
 QString g_addr = "10.42.0.1";
-QHostAddress g_adddr = QHostAddress(g_addr);
+QHostAddress g_adddr = QHostAddress(QString("10.42.0.1"));
+int g_status = 0;
 
 MyUDP::MyUDP(QObject *parent) : QObject(parent)
 {
     socket = new QUdpSocket(this);
 
-    //socket->bind(QHostAddress::LocalHost, 1234);
-    socket->bind(g_adddr, 9090);
+    socket->bind(QHostAddress::LocalHost, 1234);
+    //socket->bind(g_adddr, 9090);
     connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
 }
 
@@ -22,30 +23,43 @@ void MyUDP::helloUDP()
 
     Data.append("Starting UDP server.");
 
-    //socket->writeDatagram(Data, QHostAddress::LocalHost, 1234);
-    socket->writeDatagram(Data, g_adddr, 9090);
+    socket->writeDatagram(Data, QHostAddress::LocalHost, 1234);
+    //socket->writeDatagram(Data, g_adddr, 9090);
     emit textChanged();
 }
 
 void MyUDP::startUDP()
 {
+    qDebug() << "Trying to connect.\n";
     QByteArray Data;
-
-    Data.append("//CMD:start");
-
-    //socket->writeDatagram(Data, QHostAddress::LocalHost, 1234);
-    socket->writeDatagram(Data, g_adddr, 9090);
+    if (g_status == 0) {
+        Data.append("//CMD:start");
+        socket->writeDatagram(Data, QHostAddress::LocalHost, 1234);
+        //socket->writeDatagram(Data, g_adddr, 9090);
+        g_status = 1;
+    } else {
+        Data.append("//INFO: Radio already started.");
+        socket->writeDatagram(Data, QHostAddress::LocalHost, 1234);
+        //socket->writeDatagram(Data, g_adddr, 9090);
+    }
     emit textChanged();
 }
 
 void MyUDP::stopUDP()
 {
     QByteArray Data;
+    if (g_status == 1) {
+        Data.append("//CMD:stop");
 
-    Data.append("//CMD:stop");
+        socket->writeDatagram(Data, QHostAddress::LocalHost, 1234);
+        //socket->writeDatagram(Data, g_adddr, 9090);
+        g_status = 0;
+    } else {
+        Data.append("//INFO: Radio already stopped.");
+        socket->writeDatagram(Data, QHostAddress::LocalHost, 1234);
+        //socket->writeDatagram(Data, g_adddr, 9090);
+    }
 
-    //socket->writeDatagram(Data, QHostAddress::LocalHost, 1234);
-    socket->writeDatagram(Data, g_adddr, 9090);
     emit textChanged();
 }
 
@@ -86,6 +100,7 @@ void MyUDP::setLogFile(const QString &logFile)
 
 void MyUDP::readyRead()
 {
+    qDebug() << "Incoming data.\n";
     // when data comes in
     QByteArray buffer;
     buffer.resize(socket->pendingDatagramSize());
@@ -99,8 +114,17 @@ void MyUDP::readyRead()
     qDebug() << "Message port: " << senderPort;
     qDebug() << "Message: " << buffer;
 
-
-    m_logFile.append(QString("Message from: " + sender.toString() + "\n"));
-    m_logFile.append(QString("Message: " + buffer + "\n"));
+    if (buffer == "//CMD:start") {
+        m_logFile.append(QString("//INFO:start\n"));
+    } else if (buffer == "//CMD:stop") {
+        m_logFile.append(QString("//INFO:stop\n"));
+    }else if (buffer == "//IP:") {
+        m_logFile.append(QString(buffer+"\n"));
+    } else if (buffer == "//CMD:echo") {
+        m_logFile.append(QString("//echo:"+buffer+"\n"));
+    } else {
+        m_logFile.append(QString(buffer+"\n"));
+    }
+    //m_logFile.append(QString("Message from: " + sender.toString() + "\n"));
     emit textChanged();
 }
