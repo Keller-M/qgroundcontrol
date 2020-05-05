@@ -26,6 +26,7 @@ public slots:
     void helloUDP();
 private:
     QUdpSocket *socket;
+    QUdpSocket *inSocket;
 };
 
 #endif // MYUDP_H

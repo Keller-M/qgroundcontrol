@@ -152,8 +152,12 @@ void FtpDialog::downloadContent()
     myFile = QFileDialog::getOpenFileUrl(prnt, tr("Choose File"), myUrl, "All (*.*);;Text files (*.txt)", nullptr ,0, schemes);
 
     //  myFile = QFileDialog::getExistingDirectoryUrl(prnt, tr("Save File"), myUrl);//, "All (*.*);;Text files (*.txt)");
-    QString myFileString = myFile.fileName().left(11/*myFile.toString().indexOf("_on")*/);
+    QString myFileString = myFile.fileName();
+    qDebug() << myFileString.indexOf("_on");
+    myFileString = myFileString.mid(0,myFileString.indexOf("_on"));
+    myFileString.replace("_flt",".flt");
     myFileString.replace("_txt",".txt");
+    myFileString.replace("_-_"," - ");
     qDebug() << tr("myFile OUTPUT:") << myFileString;
 
     //Makes sure that the file we are trying to get actually exists.
