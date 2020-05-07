@@ -6,6 +6,11 @@
 #include <QObject>
 #include <QUdpSocket>
 
+extern QString g_addr;
+extern QHostAddress g_adddr;
+extern int g_status;
+extern int g_port;
+
 class MyUDP : public QObject
 {
     Q_OBJECT

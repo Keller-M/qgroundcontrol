@@ -443,7 +443,7 @@ Rectangle {
         objectName: "ipInput"
         x: 1083
         y: 47
-        text: qsTr("ftp.dlptest.com")
+        text: qsTr("10.42.0.1")
         anchors.rightMargin: 976
         font.pixelSize: 12
     }

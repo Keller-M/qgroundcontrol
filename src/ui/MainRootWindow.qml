@@ -102,6 +102,7 @@ ApplicationWindow {
     function viewSwitch(isPlanView) {
         settingsWindow.visible  = false
         setupWindow.visible     = false
+        //--------UAVRT EDIT--------
         setupWindow2.visible    = false
         analyzeWindow.visible   = false
         flightView.visible      = false
@@ -133,6 +134,7 @@ ApplicationWindow {
         setupWindow.visible = true
     }
 
+    //--------UAVRT EDIT--------
     function showSetupView2() {
         viewSwitch(false)
         setupWindow2.visible = true
@@ -355,7 +357,8 @@ ApplicationWindow {
     }
 
     //-------------------------------------------------------------------------
-    //-- Setup UPDATE
+    /// UAVRT Settings window
+    //--------UAVRT EDIT--------
     Loader {
         id:             setupWindow2
         anchors.fill:   parent

@@ -5,6 +5,7 @@
 #include "myudp.h"
 
 QString g_addr = "10.42.0.1";
+int g_port = 9090;
 QHostAddress g_adddr = QHostAddress(QString("10.42.0.1"));
 int g_status = 0;
 
