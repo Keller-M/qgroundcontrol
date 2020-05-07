@@ -93,7 +93,7 @@ Rectangle {
     */
     FileDialog {
         id: openFileDialog
-        nameFilters: ["Text Files (*.txt)", "FTP Files (*.ftp)", "All files (*)"]
+        nameFilters: ["Text Files (*.txt)", "Config Files (*.uavrt)", "All files (*)"]
         onAccepted: /*flightNotes.text = openFile(openFileDialog.fileUrl)*/ {
             //Create Request
             var request = new XMLHttpRequest();
@@ -140,7 +140,7 @@ Rectangle {
     /* TESTING */
     FileDialog {
         id: modifyDialog
-        nameFilters: ["Text Files (*.txt)", "All files (*)"]
+        nameFilters: ["Text Files (*.txt)","Config Files (*.uavrt)","All files (*)"]
         onAccepted: {
             flightNotes.text = "MODIFICATION WORKING"
             tagFreq.text = "MODIFICATION WORKING"
@@ -151,7 +151,7 @@ Rectangle {
     FileDialog {
         id: saveFileDialog
         selectExisting: false
-        nameFilters: ["Text Files (*.txt)", "FTP Files (*.ftp)", "All files (*)"]
+        nameFilters: ["Text Files (*.txt)","Config Files (*.uavrt)", "FTP Files (*.ftp)", "All files (*)"]
         onAccepted: saveFile(saveFileDialog.fileUrl, radioSamplingRate.text, uavTelemetrySampleRate.text, tagFreq.text, rfGain.text, ifGain.text, bbGain.text, pulseDuration.text, pulseRepetition.text, flightNotes.text)
     }
 
@@ -576,6 +576,15 @@ Rectangle {
         text: "Clear Terminal"
         anchors.rightMargin: 976
     }
+
+//    TreeView {
+//        id: ftpTreeView
+//        x: 848
+//        y: 140
+//        width: 400
+//        height: 300
+//        model: none.none
+//    }
     width: 1920
     height: 1080
     color: "#161616"

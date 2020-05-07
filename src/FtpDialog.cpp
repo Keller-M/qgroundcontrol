@@ -130,14 +130,14 @@ void FtpDialog::downloadContent()
     QWidget *prnt = nullptr;
     QString fileName;
     QStringList schemes = {"ftp", "file"};
-    //QFileDialog myDialog;
-    QUrl myUrl;//myUrl("ftp://rampart:rampart@10.42.0.1/");
+    QFileDialog myDialog;
+    QUrl myUrl = QUrl("ftp://rampart:rampart@10.42.0.1/UAV-RT/UDP/");
 
 
-    myUrl.setScheme("ftp");
+    myUrl.setScheme("ftp");/*
     myUrl.setHost("10.42.0.1");
     myUrl.setUserName("rampart");
-    myUrl.setPassword("rampart");
+    myUrl.setPassword("rampart");*/
 
     qDebug() << tr("myUrl OUTPUT") << myUrl;
     //qDebug() << tr("QFILE OUTPUT") << QFileInfo::QFileInfo();
@@ -149,8 +149,8 @@ void FtpDialog::downloadContent()
      * a way to use QGC's custom dialog and still be able to get an ftp connection
      * with it.
      */
-    myFile = QFileDialog::getOpenFileUrl(prnt, tr("Choose File"), myUrl, "All (*.*);;Text files (*.txt)", nullptr ,0, schemes);
-
+    myFile = /*QFileDialog::*/myDialog.getOpenFileUrl(prnt, tr("Choose File"), myUrl, "All (*.*);;Text files (*.txt)", nullptr ,0, schemes);
+    qDebug() << myFile;
     //  myFile = QFileDialog::getExistingDirectoryUrl(prnt, tr("Save File"), myUrl);//, "All (*.*);;Text files (*.txt)");
     QString myFileString = myFile.fileName();
     qDebug() << myFileString.indexOf("_on");
@@ -211,7 +211,7 @@ void FtpDialog::uploadContent()
 void FtpDialog::closeFTP()
 {
     ftp->abort();
-    ftp->close();
+    ftp->deleteLater();
     ftp = 0;
 //    if(ftp->currentCommand() == QFtp::Get)
 //    {
