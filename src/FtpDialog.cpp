@@ -6,8 +6,35 @@
 
 
 FtpDialog::FtpDialog(QObject *parent) :
-QObject(parent), ftp(0){
+QObject(parent), ftp(0), networkSession(0){
     ftp = new QFtp;
+
+
+    if (!networkSession || !networkSession->isOpen()) {
+           if (manager.capabilities() & QNetworkConfigurationManager::NetworkSessionRequired) {
+               if (!networkSession) {
+                   // Get saved network configuration
+                   QSettings settings(QSettings::UserScope, QLatin1String("Trolltech"));
+                   settings.beginGroup(QLatin1String("QtNetwork"));
+                   const QString id = settings.value(QLatin1String("DefaultNetworkConfiguration")).toString();
+                   settings.endGroup();
+
+                   // If the saved network configuration is not currently discovered use the system default
+                   QNetworkConfiguration config = manager.configurationFromIdentifier(id);
+                   if ((config.state() & QNetworkConfiguration::Discovered) !=
+                       QNetworkConfiguration::Discovered) {
+                       config = manager.defaultConfiguration();
+                   }
+
+                   networkSession = new QNetworkSession(config, this);
+                   connect(networkSession, SIGNAL(opened()), this, SLOT(connectToFtp()));
+                   connect(networkSession, SIGNAL(error(QNetworkSession::SessionError)), this, SLOT(enableConnectButton()));
+               }
+               networkSession->open();
+               return;
+           }
+       }
+
 }
 
 
@@ -15,6 +42,7 @@ FtpDialog::~FtpDialog()
 {
     //Used to clear UI, but ours is removed by QGC. May need later
     //delete ui;
+
 }
 
 
@@ -56,12 +84,16 @@ void FtpDialog::setLogFile(const QString &logFile)
  */
 void FtpDialog::connectClicked(QString input)
 {
+
+
+    ftp->setTransferMode(QFtp::Active);
+
     ftp->connectToHost(input);
 
     //Required login for the default IP address
-    if(input == "ftp.dlptest.com")
+    if(input == "10.42.0.1")
     {
-        ftp->login("dlpuser@dlptest.com","SzMf7rTE4pCrf9dV286GuNe4N");
+        ftp->login("rampart","rampart");
     }
 
     connect(ftp, SIGNAL(dataTransferProgress(qint64, qint64)),
@@ -97,12 +129,16 @@ void FtpDialog::downloadContent()
 {
     QWidget *prnt = nullptr;
     QString fileName;
+    QStringList schemes = {"ftp", "file"};
     //QFileDialog myDialog;
-    QUrl myUrl;
+    QUrl myUrl;//myUrl("ftp://rampart:rampart@10.42.0.1/");
+
+
     myUrl.setScheme("ftp");
-    myUrl.setHost("ftp.dlptest.com");
-    myUrl.setUserName("dlpuser@dlptest.com");
-    myUrl.setPassword("SzMf7rTE4pCrf9dV286GuNe4N");
+    myUrl.setHost("10.42.0.1");
+    myUrl.setUserName("rampart");
+    myUrl.setPassword("rampart");
+
     qDebug() << tr("myUrl OUTPUT") << myUrl;
     //qDebug() << tr("QFILE OUTPUT") << QFileInfo::QFileInfo();
     QUrl myFile;
@@ -113,16 +149,19 @@ void FtpDialog::downloadContent()
      * a way to use QGC's custom dialog and still be able to get an ftp connection
      * with it.
      */
-//    fileName = QFileDialog::getOpenFileName(this, tr("Save File"),
-//                                       myUrl);
-//    myDialog.setDirectory(myUrl.toString());
-    //qDebug() << ;
-    myFile = QFileDialog::getOpenFileUrl(prnt, tr("Save File"), myUrl, "All (*.*);;Text files (*.txt)");
+    myFile = QFileDialog::getOpenFileUrl(prnt, tr("Choose File"), myUrl, "All (*.*);;Text files (*.txt)", nullptr ,0, schemes);
 
-    qDebug() << tr("myFile OUTPUT:") << myFile.fileName();
+    //  myFile = QFileDialog::getExistingDirectoryUrl(prnt, tr("Save File"), myUrl);//, "All (*.*);;Text files (*.txt)");
+    QString myFileString = myFile.fileName();
+    qDebug() << myFileString.indexOf("_on");
+    myFileString = myFileString.mid(0,myFileString.indexOf("_on"));
+    myFileString.replace("_flt",".flt");
+    myFileString.replace("_txt",".txt");
+    myFileString.replace("_-_"," - ");
+    qDebug() << tr("myFile OUTPUT:") << myFileString;
 
     //Makes sure that the file we are trying to get actually exists.
-    localFile = new QFile(myFile.fileName());
+    localFile = new QFile(myFileString/*myFile.fileName()*/);
     if (!localFile->open(QIODevice::ReadWrite))
     {
         qDebug() << tr("------------FILE NOT OPEN-----------------");
@@ -132,18 +171,7 @@ void FtpDialog::downloadContent()
 
     qDebug() << tr("LOCAL FILE-----") << localFile->fileName();
 
-    ftp->get(myFile.fileName(), localFile);
-
-    //Add action to the log
-    m_logFile.append(ftp->get(myFile.fileName()+"\n", localFile));
-    m_logFile.append(ftp->currentCommand());
-    setLogFile(m_logFile);
-
-    //Debug output
-//    qDebug()<<ftp->get(myFile.fileName(), localFile);
-//    qDebug()<<ftp->currentCommand();
-
-
+    ftp->get(myFileString, localFile);
 
 }
 
@@ -167,13 +195,9 @@ void FtpDialog::uploadContent()
     ftp->put(localFile, myFile.fileName());
 
     //Add action to the log
-    m_logFile.append(ftp->put(localFile, QString("uploadFile.txt")));
-    m_logFile.append(ftp->currentCommand());
-    setLogFile(m_logFile);
-
     //Debug output
-    qDebug()<<ftp->put(localFile, QString("uploadFile.txt"));
-    qDebug()<<ftp->currentCommand();
+//    qDebug()<<ftp->put(localFile, myFile.fileName()/*QString("uploadFile.txt")*/);
+//    qDebug()<<ftp->currentCommand();
 
 
 
@@ -186,13 +210,16 @@ void FtpDialog::uploadContent()
  */
 void FtpDialog::closeFTP()
 {
-    if(ftp->currentCommand() == QFtp::Get)
-    {
-    }
-    else
-    {
-        ftp->close();
-    }
+    ftp->abort();
+    ftp->close();
+    ftp = 0;
+//    if(ftp->currentCommand() == QFtp::Get)
+//    {
+//    }
+//    else
+//    {
+//        ftp->close();
+//    }
 }
 
 
@@ -211,14 +238,9 @@ void FtpDialog::ftpCommandFinished(int request, bool error)
     if(error)
     {
 
-        m_logFile.append(QString("FTP request %1 returned: '%2'")
-                       .arg(request)
-                       .arg(ftp->errorString()));
-        setLogFile(m_logFile);
-
         qDebug() << QString("FTP request %1 returned: '%2'")
-                    .arg(request)
-                    .arg(ftp->errorString());
+                .arg(request)
+                .arg(ftp->errorString());
 
     }
     else

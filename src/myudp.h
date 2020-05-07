@@ -26,11 +26,12 @@ signals:
 public slots:
     void readyRead();
     void readIncoming();
-    void HelloUDP();
     void startUDP();
     void stopUDP();
+    void helloUDP();
 private:
     QUdpSocket *socket;
+    QUdpSocket *inSocket;
 };
 
 #endif // MYUDP_H

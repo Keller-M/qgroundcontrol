@@ -9,6 +9,9 @@
 #include <QQuickView>
 #include <QDir>
 #include <QFileDialog>
+#include <QNetworkConfigurationManager>
+
+class QNetworkSession;
 
 class FtpDialog : public QObject
 {
@@ -25,6 +28,8 @@ class FtpDialog : public QObject
         QObject *object;
         QString m_logFile = "";
         QString getLogFile();
+        QNetworkSession *networkSession;
+        QNetworkConfigurationManager manager;
         void setLogFile(const QString &logFile);
         ~FtpDialog();
 

@@ -1,6 +1,6 @@
 // Generic Imports
 import QtQuick 2.3
-import QtQuick.Controls 1.2
+import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
 import QtQuick.Dialogs 1.2
 
@@ -158,25 +158,25 @@ Rectangle {
 
     Rectangle {
         id: configBackground
-        x: 378
+        x: 8
         y: 7
         width: 333
         height: 512
-        color: "#2c2c2c"
+        color: "#b5b5b5"
     }
 
     Rectangle {
         id: udpBackground
-        x: 843
+        x: 453
         y: 7
-        width: 360
-        height: 855
-        color: "#2c2c2c"
+        width: 362
+        height: 874
+        color: "#b5b5b5"
     }
 
     Grid {
         id: grid
-        x: 402
+        x: 28
         y: 43
         width: 400
         height: 400
@@ -187,7 +187,7 @@ Rectangle {
 
         Text {
             id: tagFreqLabel
-            color: "#ffffff"
+            color: "#000000"
             text: qsTr("Tag Frequency (MHz)")
             font.pixelSize: 12
         }
@@ -199,7 +199,7 @@ Rectangle {
 
         Text {
             id: rfGainLabel
-            color: "#ffffff"
+            color: "#000000"
             text: qsTr("RF Gain (dB)")
             font.pixelSize: 12
         }
@@ -211,7 +211,7 @@ Rectangle {
 
         Text {
             id: ifGainLabel
-            color: "#ffffff"
+            color: "#000000"
             text: qsTr("IF Gain (dB)")
             font.pixelSize: 12
         }
@@ -223,7 +223,7 @@ Rectangle {
 
         Text {
             id: bbGainLabel
-            color: "#ffffff"
+            color: "#000000"
             text: qsTr("BB Gain (dB)")
             font.pixelSize: 12
         }
@@ -235,7 +235,7 @@ Rectangle {
 
         Text {
             id: radioSamplingRateLabel
-            color: "#ffffff"
+            color: "#000000"
             text: qsTr("Radio Sampling Rate (HZ)")
             font.pixelSize: 12
         }
@@ -247,7 +247,7 @@ Rectangle {
 
         Text {
             id: pulseDurationLabel
-            color: "#ffffff"
+            color: "#000000"
             text: qsTr("Pulse Duration (s)")
             font.pixelSize: 12
         }
@@ -259,7 +259,7 @@ Rectangle {
 
         Text {
             id: pulseRepetitionLabel
-            color: "#ffffff"
+            color: "#000000"
             text: qsTr("Pulse Repetition Rate (s)")
             font.pixelSize: 12
         }
@@ -271,7 +271,7 @@ Rectangle {
 
         Text {
             id: uavTelemetrySampleRateLabel
-            color: "#ffffff"
+            color: "#000000"
             text: qsTr("Uav Telem. Sample Rate (Hz)")
             font.pixelSize: 12
         }
@@ -288,17 +288,19 @@ Rectangle {
 
     TextField {
         id: configName
-        x: 410
+        x: 36
         y: 449
+        width: 92
+        height: 22
         text: "Config name"
         placeholderText: qsTr("Text Field")
     }
 
     Text {
         id: flightNotesLael
-        x: 410
-        y: 316
-        color: "#ffffff"
+        x: 28
+        y: 317
+        color: "#000000"
         text: qsTr("Flight Notes")
         font.pixelSize: 12
     }
@@ -306,24 +308,26 @@ Rectangle {
     Button {
         id: saveConfigButton
         onClicked: saveFileDialog.open()
-        x: 414
-        y: 478
+        x: 134
+        y: 448
+        width: 72
+        height: 24
         text: qsTr("Save")
     }
 
     TextArea {
         id: flightNotes
-        x: 410
+        x: 28
         y: 337
-        width: 285
+        width: 293
         height: 106
     }
 
     Text {
         id: flightSettingsLabel
-        x: 402
+        x: 28
         y: 8
-        color: "#ffffff"
+        color: "#000000"
         text: qsTr("Flight Settings")
         font.pixelSize: 20
     }
@@ -334,7 +338,7 @@ Rectangle {
 
 
     FtpDialog{
-        id: myobject
+        id: ftpObject
     }
 
     MyUdp{
@@ -343,11 +347,11 @@ Rectangle {
 
     Button {
         id: connectFTPButton
-        x: 864
-        y: 43
+        x: 474
+        y: 85
         text: qsTr("Connect")
         onClicked: {
-            myobject.connectClicked(ipInput.text)
+            ftpObject.connectClicked("10.42.0.1")
         }
 
     }
@@ -355,27 +359,27 @@ Rectangle {
     Button {
         id: importSettingsButton
         onClicked: openFileDialog.open()
-        x: 592
-        y: 449
+        x: 36
+        y: 478
         text: qsTr("Import Settings")
     }
 
     Button {
         id: disconnectFTPButton
-        x: 864
-        y: 77
+        x: 548
+        y: 85
         text: qsTr("Disconnect")
         anchors.rightMargin: 976
         onClicked:{
-            myobject.closeFTP()
+            ftpObject.closeFTP()
         }
     }
 
     Text {
         id: systemControlLabel
-        x: 864
+        x: 474
         y: 8
-        color: "#ffffff"
+        color: "#000000"
         text: qsTr("System Control")
         anchors.rightMargin: 976
         font.pixelSize: 20
@@ -383,15 +387,17 @@ Rectangle {
 
     Button {
         id: sendSettingsButton
-        x: 592
+        x: 124
         y: 478
+        width: 82
+        height: 23
         text: qsTr("Send Settings")
     }
 
     Button {
         id: startRadioButton
-        x: 864
-        y: 124
+        x: 474
+        y: 478
         text: qsTr("Start Radio")
         anchors.rightMargin: 976
         onClicked:
@@ -400,8 +406,8 @@ Rectangle {
 
     Button {
         id: stopRadioButton
-        x: 950
-        y: 124
+        x: 555
+        y: 478
         text: qsTr("Stop Radio")
         anchors.rightMargin: 976
         onClicked:
@@ -411,58 +417,51 @@ Rectangle {
 
     Button {
         id: dowloadFtpButton
-        x: 864
-        y: 106
+        x: 474
+        y: 111
         text: qsTr("Download")
         onClicked:
-            myobject.downloadContent()
+            ftpObject.downloadContent()
     }
 
     Button {
         id: uploadFtpButton
-        x: 950
-        y: 106
+        x: 548
+        y: 111
         text: qsTr("Upload")
         onClicked:
-            myobject.uploadContent()
+            ftpObject.uploadContent()
     }
 
 
     Text {
         id: connectionStatusLabel
-        x: 956
-        y: 47
-        color: "#ffffff"
+        x: 638
+        y: 62
+        color: "#000000"
         text: qsTr("Connection Status")
         anchors.rightMargin: 976
         font.pixelSize: 12
     }
 
     TextField {
-        id: ipInput
         objectName: "ipInput"
-        x: 1083
-        y: 47
-        text: qsTr("10.42.0.1")
+        x: 474
+        y: 59
+        width: 149
+        height: 20
+        text: qsTr("ftp.dlptest.com")
         anchors.rightMargin: 976
         font.pixelSize: 12
     }
 
-
-    Text {
-        id: element
-        x: 1114
-        y: 53
-        color: "#ffffff"
-        text: qsTr("Status")
-        anchors.rightMargin: 976
-        font.pixelSize: 12
-    }
 
     TextField {
         id: textField
-        x: 1083
-        y: 72
+        x: 638
+        y: 82
+        width: 98
+        height: 20
         text: "Unknown"
         anchors.rightMargin: 976
         placeholderText: qsTr("Text Field")
@@ -470,9 +469,9 @@ Rectangle {
 
     Text {
         id: lastHeartBeatLabel
-        x: 1095
-        y: 92
-        color: "#ffffff"
+        x: 675
+        y: 482
+        color: "#000000"
         text: qsTr("Last Heartbeat")
         anchors.rightMargin: 976
         font.pixelSize: 12
@@ -480,8 +479,10 @@ Rectangle {
 
     TextField {
         id: lastHeartbeat
-        x: 1083
-        y: 107
+        x: 757
+        y: 480
+        width: 37
+        height: 20
         text: "0"
         anchors.rightMargin: 976
         placeholderText: qsTr("Text Field")
@@ -489,9 +490,11 @@ Rectangle {
 
     Text {
         id: ftpLabel
-        x: 965
-        y: 85
-        color: "#ffffff"
+        x: 474
+        y: 38
+        width: 20
+        height: 15
+        color: "#000000"
         text: qsTr("FTP")
         anchors.rightMargin: 976
         font.pixelSize: 12
@@ -499,9 +502,9 @@ Rectangle {
 
     Text {
         id: udpLabel
-        x: 1025
-        y: 85
-        color: "#ffffff"
+        x: 474
+        y: 458
+        color: "#000000"
         text: qsTr("UDP")
         anchors.rightMargin: 976
         font.pixelSize: 12
@@ -510,64 +513,68 @@ Rectangle {
     TextArea {
         id: terminalArea
         objectName: "testOutput"
-        x: 864
-        y: 154
+        x: 474
+        y: 561
         width: 320
-        height: 602
+        height: 300
         anchors.rightMargin: 976
         text: udpObject.logFile
     }
 
-    Text {
-        id: element1
-        x: 1054
-        y: 135
-        color: "#ffffff"
-        text: qsTr("Vehicle Terminal Area")
+    TextArea {
+        id: ftpTerminalArea
+        objectName: "testOutput"
+        x: 474
+        y: 140
+        width: 320
+        height: 300
         anchors.rightMargin: 976
-        font.pixelSize: 12
+        text: ftpObject.logFile
     }
 
-    ToolButton {
-        id: clearTerminalButton
-        x: 890
-        y: 770
+    Button {
+        id: clearUDPTerminalButton
+        x: 718
+        y: 532
         text: "Clear Terminal"
+        clip: false
         anchors.rightMargin: 976
     }
 
-    ToolButton {
+    Button {
         id: cleanConnectionButton
-        x: 870
-        y: 798
+        x: 474
+        y: 507
         text: "Clean up Connection"
         anchors.rightMargin: 976
     }
 
-    ToolButton {
+    Button {
         id: connectionSettingsButton
-        x: 872
-        y: 826
+        x: 474
+        y: 532
+        width: 107
+        height: 23
         text: "Connection Settings"
         anchors.rightMargin: 976
     }
 
-    ToolButton {
+    Button {
         id: refreshIPButton
         //objectName: refreshIPButtonName
-        x: 1028
-        y: 798
+        x: 587
+        y: 507
         text: "Refresh IP"
+        onClicked: udpObject.helloUDP();
         anchors.rightMargin: 976
     }
 
-    ToolButton {
-        id: snapWindowButton
-        x: 1016
-        y: 826
-        text: "Snap Window"
+    Button {
+        id: clearFTPTerminalButton
+        x: 719
+        y: 111
+        text: "Clear Terminal"
         anchors.rightMargin: 976
-        onClicked: udpObject.HelloUDP();
     }
     width: 1920
     height: 1080
@@ -674,3 +681,5 @@ Rectangle {
     }
     */
 }
+
+
