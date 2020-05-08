@@ -566,8 +566,17 @@ Rectangle {
         x: 587
         y: 507
         text: "Refresh IP"
-        onClicked: udpObject.helloUDP();
+        onClicked: udpObject.helloUDP(ipInputField.text);
         anchors.rightMargin: 976
+    }
+
+    TextField {
+        id: ipInputField
+        x: 700
+        y: 507
+        width: 120
+        height: 22
+        placeholderText: qsTr("Enter Computer IP")
     }
 
     Button {

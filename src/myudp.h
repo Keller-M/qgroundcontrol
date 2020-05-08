@@ -10,6 +10,7 @@ extern QString g_addr;
 extern QHostAddress g_adddr;
 extern int g_status;
 extern int g_port;
+extern QHostAddress g_returnAddr;
 
 class MyUDP : public QObject
 {
@@ -28,7 +29,7 @@ public slots:
     void readIncoming();
     void startUDP();
     void stopUDP();
-    void helloUDP();
+    void helloUDP(QString);
 private:
     QUdpSocket *socket;
     QUdpSocket *inSocket;

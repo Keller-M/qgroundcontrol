@@ -6,6 +6,7 @@ QString g_addr = "10.42.0.1";
 int g_port = 9090;
 QHostAddress g_adddr = QHostAddress(QString("10.42.0.1"));
 int g_status = 0;
+QHostAddress g_returnAddr;
 
 MyUDP::MyUDP(QObject *parent) : QObject(parent)
 {
@@ -19,14 +20,15 @@ MyUDP::MyUDP(QObject *parent) : QObject(parent)
 //    connect(inSocket, SIGNAL(readyRead()),this, SLOT(readyRead()));
 }
 
-void MyUDP::helloUDP()
+void MyUDP::helloUDP(QString input)
 {
     QByteArray Data;
     g_status = 0;
-    Data.append("//IP:10.42.0.32 ");
-    setLogFile("//IP:10.42.0.32 ");
+    Data.append("//" + input);
+    setLogFile("//" + input);
 //    socket->writeDatagram(Data, QHostAddress::LocalHost, 9090);
     socket->writeDatagram(Data, g_adddr, 9090);
+    g_returnAddr = QHostAddress(QString(input));
     emit textChanged();
 }
 
