@@ -93,7 +93,7 @@ Rectangle {
     */
     FileDialog {
         id: openFileDialog
-        nameFilters: ["Text Files (*.txt)", "FTP Files (*.ftp)", "All files (*)"]
+        nameFilters: ["Text Files (*.txt)", "Config Files (*.uavrt)", "All files (*)"]
         onAccepted: /*flightNotes.text = openFile(openFileDialog.fileUrl)*/ {
             //Create Request
             var request = new XMLHttpRequest();
@@ -140,7 +140,7 @@ Rectangle {
     /* TESTING */
     FileDialog {
         id: modifyDialog
-        nameFilters: ["Text Files (*.txt)", "All files (*)"]
+        nameFilters: ["Text Files (*.txt)","Config Files (*.uavrt)","All files (*)"]
         onAccepted: {
             flightNotes.text = "MODIFICATION WORKING"
             tagFreq.text = "MODIFICATION WORKING"
@@ -151,7 +151,7 @@ Rectangle {
     FileDialog {
         id: saveFileDialog
         selectExisting: false
-        nameFilters: ["Text Files (*.txt)", "FTP Files (*.ftp)", "All files (*)"]
+        nameFilters: ["Text Files (*.txt)","Config Files (*.uavrt)", "FTP Files (*.ftp)", "All files (*)"]
         onAccepted: saveFile(saveFileDialog.fileUrl, radioSamplingRate.text, uavTelemetrySampleRate.text, tagFreq.text, rfGain.text, ifGain.text, bbGain.text, pulseDuration.text, pulseRepetition.text, flightNotes.text)
     }
 
@@ -351,7 +351,7 @@ Rectangle {
         y: 85
         text: qsTr("Connect")
         onClicked: {
-            ftpObject.connectClicked("10.42.0.1")
+            ftpObject.connectClicked(ipInput.text, user.text, pass.text)
         }
 
     }
@@ -434,37 +434,38 @@ Rectangle {
     }
 
 
-    Text {
-        id: connectionStatusLabel
-        x: 638
-        y: 62
-        color: "#000000"
-        text: qsTr("Connection Status")
-        anchors.rightMargin: 976
-        font.pixelSize: 12
-    }
-
     TextField {
-        objectName: "ipInput"
+        id: ipInput
         x: 474
         y: 59
-        width: 149
+        width: 107
         height: 20
-        text: qsTr("ftp.dlptest.com")
+        text: qsTr("10.42.0.1")
         anchors.rightMargin: 976
         font.pixelSize: 12
     }
 
 
     TextField {
-        id: textField
-        x: 638
-        y: 82
-        width: 98
+        id: user
+        x: 602
+        y: 59
+        width: 93
         height: 20
-        text: "Unknown"
+        text: "Username"
         anchors.rightMargin: 976
-        placeholderText: qsTr("Text Field")
+        placeholderText: qsTr("Username")
+    }
+
+    TextField {
+        id: pass
+        x: 701
+        y: 59
+        width: 93
+        height: 20
+        text: "Password"
+        anchors.rightMargin: 976
+        placeholderText: qsTr("Password")
     }
 
     Text {
@@ -576,6 +577,16 @@ Rectangle {
         text: "Clear Terminal"
         anchors.rightMargin: 976
     }
+
+
+//    TreeView {
+//        id: ftpTreeView
+//        x: 848
+//        y: 140
+//        width: 400
+//        height: 300
+//        model: none.none
+//    }
     width: 1920
     height: 1080
     color: "#161616"

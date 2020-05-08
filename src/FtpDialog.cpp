@@ -82,19 +82,22 @@ void FtpDialog::setLogFile(const QString &logFile)
  * signals needed to properly communicate with the server.
  * @param input - A QString containing a user's desired ip address.
  */
-void FtpDialog::connectClicked(QString input)
+void FtpDialog::connectClicked(QString input, QString user, QString pass)
 {
-
+    m_address = input;
+    m_user = user;
+    m_pass = pass;
 
     ftp->setTransferMode(QFtp::Active);
 
     ftp->connectToHost(input);
 
+    ftp->login(user, pass);
     //Required login for the default IP address
-    if(input == "10.42.0.1")
+/*  if(input == "10.42.0.1")
     {
         ftp->login("rampart","rampart");
-    }
+    } */
 
     connect(ftp, SIGNAL(dataTransferProgress(qint64, qint64)),
          this, SLOT(my_dataTransferProgress(qint64,qint64)));
@@ -130,14 +133,14 @@ void FtpDialog::downloadContent()
     QWidget *prnt = nullptr;
     QString fileName;
     QStringList schemes = {"ftp", "file"};
-    //QFileDialog myDialog;
-    QUrl myUrl;//myUrl("ftp://rampart:rampart@10.42.0.1/");
+    QFileDialog myDialog;
+    QUrl myUrl = QUrl("ftp://"+m_user+":"+m_pass+"@"+m_address+"/UAV-RT/UDP/");
 
 
-    myUrl.setScheme("ftp");
+    myUrl.setScheme("ftp");/*
     myUrl.setHost("10.42.0.1");
     myUrl.setUserName("rampart");
-    myUrl.setPassword("rampart");
+    myUrl.setPassword("rampart");*/
 
     qDebug() << tr("myUrl OUTPUT") << myUrl;
     //qDebug() << tr("QFILE OUTPUT") << QFileInfo::QFileInfo();
@@ -149,14 +152,15 @@ void FtpDialog::downloadContent()
      * a way to use QGC's custom dialog and still be able to get an ftp connection
      * with it.
      */
-    myFile = QFileDialog::getOpenFileUrl(prnt, tr("Choose File"), myUrl, "All (*.*);;Text files (*.txt)", nullptr ,0, schemes);
-
+    myFile = /*QFileDialog::*/myDialog.getOpenFileUrl(prnt, tr("Choose File"), myUrl, "All (*.*);;Text files (*.txt)", nullptr ,0, schemes);
+    qDebug() << myFile;
     //  myFile = QFileDialog::getExistingDirectoryUrl(prnt, tr("Save File"), myUrl);//, "All (*.*);;Text files (*.txt)");
     QString myFileString = myFile.fileName();
     qDebug() << myFileString.indexOf("_on");
     myFileString = myFileString.mid(0,myFileString.indexOf("_on"));
     myFileString.replace("_flt",".flt");
     myFileString.replace("_txt",".txt");
+    myFileString.replace("_uavrt",".uavrt");
     myFileString.replace("_-_"," - ");
     qDebug() << tr("myFile OUTPUT:") << myFileString;
 
@@ -191,7 +195,6 @@ void FtpDialog::uploadContent()
         delete localFile;
         return;
     }
-
     ftp->put(localFile, myFile.fileName());
 
     //Add action to the log
@@ -211,7 +214,7 @@ void FtpDialog::uploadContent()
 void FtpDialog::closeFTP()
 {
     ftp->abort();
-    ftp->close();
+    ftp->deleteLater();
     ftp = 0;
 //    if(ftp->currentCommand() == QFtp::Get)
 //    {
