@@ -34,7 +34,7 @@ class FtpDialog : public QObject
         ~FtpDialog();
 
     public slots:
-        void connectClicked(QString);
+        void connectClicked(QString, QString, QString);
         void ftpCommandFinished(int, bool);
         void downloadContent();
         void uploadContent();
@@ -52,6 +52,9 @@ class FtpDialog : public QObject
         void textChanged();
     public:
         QFtp * ftp;
+        QString m_address;
+        QString m_user;
+        QString m_pass;
 };
 
 #endif // FTPDIALOG_H

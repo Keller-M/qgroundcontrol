@@ -351,7 +351,7 @@ Rectangle {
         y: 85
         text: qsTr("Connect")
         onClicked: {
-            ftpObject.connectClicked("10.42.0.1")
+            ftpObject.connectClicked(ipInput.text, user.text, pass.text)
         }
 
     }
@@ -434,21 +434,11 @@ Rectangle {
     }
 
 
-    Text {
-        id: connectionStatusLabel
-        x: 638
-        y: 62
-        color: "#000000"
-        text: qsTr("Connection Status")
-        anchors.rightMargin: 976
-        font.pixelSize: 12
-    }
-
     TextField {
-        objectName: "ipInput"
+        id: ipInput
         x: 474
         y: 59
-        width: 149
+        width: 107
         height: 20
         text: qsTr("10.42.0.1")
         anchors.rightMargin: 976
@@ -457,14 +447,25 @@ Rectangle {
 
 
     TextField {
-        id: textField
-        x: 638
-        y: 82
-        width: 98
+        id: user
+        x: 602
+        y: 59
+        width: 93
         height: 20
-        text: "Unknown"
+        text: "Username"
         anchors.rightMargin: 976
-        placeholderText: qsTr("Text Field")
+        placeholderText: qsTr("Username")
+    }
+
+    TextField {
+        id: pass
+        x: 701
+        y: 59
+        width: 93
+        height: 20
+        text: "Password"
+        anchors.rightMargin: 976
+        placeholderText: qsTr("Password")
     }
 
     Text {
@@ -576,6 +577,7 @@ Rectangle {
         text: "Clear Terminal"
         anchors.rightMargin: 976
     }
+
 
 //    TreeView {
 //        id: ftpTreeView
