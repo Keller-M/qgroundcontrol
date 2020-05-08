@@ -24,8 +24,8 @@ void MyUDP::helloUDP(QString input)
 {
     QByteArray Data;
     g_status = 0;
-    Data.append("//" + input);
-    setLogFile("//" + input);
+    Data.append("//IP:" + input);
+    setLogFile("//IP:" + input);
 //    socket->writeDatagram(Data, QHostAddress::LocalHost, 9090);
     socket->writeDatagram(Data, g_adddr, 9090);
     g_returnAddr = QHostAddress(QString(input));
